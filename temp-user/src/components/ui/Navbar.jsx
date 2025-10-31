@@ -19,6 +19,7 @@
   } from "@/components/ui/popover";
   import { cn } from "@/lib/utils";
 import { DropdownMenuDialog } from "./DropDown";
+import { useNavigate } from "react-router-dom";
 
   // Simple logo component for the navbar
   const Logo = (props) => {
@@ -127,6 +128,8 @@ import { DropdownMenuDialog } from "./DropDown";
         }
       };
 
+      const navigate = useNavigate();
+
       return (
         <>
           <header
@@ -173,7 +176,7 @@ import { DropdownMenuDialog } from "./DropDown";
                   </NavigationMenu>
                 )}
 
-                <form onSubmit={handleSearchSubmit} className="relative">
+                <form onSubmit={handleSearchSubmit} className="relative md:hidden">
                   <Input
                     id={searchId}
                     name="search"
@@ -189,16 +192,6 @@ import { DropdownMenuDialog } from "./DropDown";
               {/* Right side */}
               {!isMobile && (
                 <div className="flex items-center gap-3">
-                  <Button
-                    size="sm"
-                    className="text-sm font-medium px-4 h-9 rounded-md shadow-sm"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (onSignInClick) onSignInClick();
-                    }}
-                  >
-                    <LogIn />
-                  </Button>
                   <Button
                     size="sm"
                     className="text-sm font-medium px-4 h-9 rounded-md shadow-sm"
@@ -221,19 +214,19 @@ import { DropdownMenuDialog } from "./DropDown";
             <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-md md:hidden">
               <ul className="flex justify-around items-center h-14">
                 {[
-                  { label: "Home", icon: <House/>},
-                  { label: "Offers", icon: <Gift/> },
-                  { label: "Menu", icon: <ShoppingBasket/> },
-                  {label:"Cart",icon:<ShoppingCart/>},
-                  { label: "Profile", icon: <CircleUserRound/> },
+                  { label: "Home", icon: <House/>,link:"#"},
+                  { label: "Offers", icon: <Gift/>,link:"#" },
+                  { label: "Menu", icon: <ShoppingBasket/>,link:"#" },
+                  {label:"Cart",icon:<ShoppingCart/>,link:"#"},
+                  { label: "Profile", icon: <CircleUserRound/>,link:"/login" },
                 ].map((item, i) => (
                   <li key={i}>
                     <button
                       onClick={() => console.log(item.label)}
                       className="flex flex-col items-center text-sm text-muted-foreground hover:text-primary transition-colors"
                     >
-                      <span className="text-lg">{item.icon}</span>
-                      <span className="text-[11px]">{item.label}</span>
+                      <span className="text-lg" onClick={()=>{navigate(item.link)}}>{item.icon}</span>
+                      <span className="text-[11px]" onClick={()=>{navigate(item.link)}}>{item.label}</span>
                     </button>
                   </li>
                 ))}

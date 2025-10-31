@@ -2,7 +2,7 @@ import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, Heart, MessageCircle
 
 export default function Footer() {
   return (
-    <footer className="bg-gradient-to-br from-pink-100 via-pink-200 to-pink-300 text-gray-800 border-t border-pink-300 mt-10">
+    <footer className="bg-gradient-to-br from-pink-100 via-pink-200 to-pink-300 text-gray-800 border-t border-pink-300  w-full">
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-10">
         
         {/* Brand Section */}

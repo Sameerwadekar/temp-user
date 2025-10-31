@@ -15,9 +15,9 @@ export function SignupForm({
   ...props
 }) {
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="overflow-hidden p-0">
-        <CardContent className="grid p-0 md:grid-cols-2">
+    <div className={cn("flex flex-col gap-6 mt-5", className)} {...props}>
+      <div className="overflow-hidden p-0 flex flex-col justify-center items-center w-full">
+        <CardContent className=" w-full md:w-1/3">
           <form className="p-6 md:p-8">
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
@@ -88,14 +88,8 @@ export function SignupForm({
               </FieldDescription>
             </FieldGroup>
           </form>
-          <div className="bg-muted relative hidden md:block">
-            <img
-              src="/placeholder.svg"
-              alt="Image"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale" />
-          </div>
         </CardContent>
-      </Card>
+      </div>
       <FieldDescription className="px-6 text-center">
         By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
         and <a href="#">Privacy Policy</a>.

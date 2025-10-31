@@ -21,8 +21,8 @@ export function LoginForm({
   ...props
 }) {
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
+    <div className={cn("flex flex-col gap-6 justify-center items-center w-full mt-5", className)} {...props}>
+      <div className="flex flex-col  w-full md:w-1/3">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>
           <CardDescription>
@@ -30,7 +30,7 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form className="mt-5">
             <FieldGroup>
               <Field>
                 <Button variant="outline" type="button">
@@ -75,7 +75,7 @@ export function LoginForm({
             </FieldGroup>
           </form>
         </CardContent>
-      </Card>
+      </div>
       <FieldDescription className="px-6 text-center">
         By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
         and <a href="#">Privacy Policy</a>.

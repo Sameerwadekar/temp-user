@@ -7,11 +7,18 @@ import { createBrowserRouter, Outlet,RouterProvider } from "react-router-dom";
 
 function Layout() {
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
+      {/* Navbar stays on top */}
       <Navbar04 />
-      <Outlet />
+
+      {/* Main content grows and pushes footer down */}
+      <main className="flex-grow">
+        <Outlet />
+      </main>
+
+      {/* Footer always touches bottom */}
       <Footer />
-    </>
+    </div>
   );
 }
 
