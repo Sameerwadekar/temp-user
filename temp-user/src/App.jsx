@@ -1,4 +1,4 @@
-import { LoginForm } from "./components/login-form";
+import { LoginForm } from "./components/Login-form";
 import { SignupForm } from "./components/signup-form";
 import Home from "./components/ui/Home";
 import { Navbar04 } from "./components/ui/Navbar";
