@@ -4,6 +4,7 @@ import Home from "./components/ui/Home";
 import { Navbar04 } from "./components/ui/Navbar";
 import Footer from "./components/Footer";
 import { createBrowserRouter, Outlet,RouterProvider } from "react-router-dom";
+import Menu from "./components/Menu";
 
 function Layout() {
   return (
@@ -38,6 +39,10 @@ function App() {
         {
           path:"/signin",
           element:<SignupForm/>
+        },
+        {
+          path:"/menu",
+          element:<Menu/>
         }
       ],
     },
