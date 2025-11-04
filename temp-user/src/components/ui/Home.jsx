@@ -2,8 +2,11 @@ import React from "react";
 import staw from "../../assets/home-bowl.png";
 import { Button } from "./button";
 import { ArrowRight } from "lucide-react";
+import Menu from "../Menu";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const navigate = useNavigate();
   return (
     <>
       <section className="relative w-full h-auto md:h-[60vh] overflow-visible bg-[#71CA9A] py-10 md:py-0">
@@ -22,7 +25,7 @@ const Home = () => {
               <p>Flavorful, 100% dairy free.</p>
             </div>
             <div className="my-2 py-2 ">
-              <Button className={"bg-[#01693a]"} size="lg">
+              <Button className={"bg-[#01693a]"} size="lg" onClick={()=> navigate("/menu")}>
                 Shop Now <ArrowRight />
               </Button>
             </div>
