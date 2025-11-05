@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import MenuCard from "../components/ui/MenuCard"
+import { ChevronLeft, ChevronRight, Funnel } from "lucide-react";
+import FilterSheet from './ui/FilterSheet'
 
 export default function Menu() {
   const [categories, setCategories] = useState([]);
@@ -10,7 +13,7 @@ export default function Menu() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const itemsPerPage = 16;
+  const itemsPerPage = 12;
 
   // Fetch all categories
   useEffect(() => {
@@ -42,7 +45,7 @@ export default function Menu() {
   return (
     <div className="flex">
       {/* Sidebar Categories */}
-      <aside className="w-1/5 border-r bg-gray-50 p-4">
+      <aside className="w-1/5 border-r bg-gray-50 p-4 sm:block hidden">
         <h2 className="text-lg font-semibold mb-2">Categories</h2>
         <ul className="space-y-2">
           {categories.map((cat) => (
@@ -65,11 +68,13 @@ export default function Menu() {
           ))}
         </ul>
       </aside>
+      {/* filter icon */}
+      
 
       {/* Main Menu Items */}
       <main className="flex-1 p-6">
         <h1 className="text-2xl font-bold mb-4">{selectedCat} Menu</h1>
-
+          <div className=" md:hidden absolute top-[90px] right-5"><FilterSheet/></div>
         {loading ? (
           <div className="grid grid-cols-4 gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
@@ -80,7 +85,7 @@ export default function Menu() {
           <p className="text-gray-500">No meals available for this category.</p>
         ) : (
           <>
-            <div className="grid grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {currentMeals.map((meal) => (
                 <Card key={meal.idMeal} className="overflow-hidden">
                   <img
@@ -97,6 +102,7 @@ export default function Menu() {
                     </Button>
                   </CardContent>
                 </Card>
+                // <MenuCard meal={meal}/>
               ))}
             </div>
 
@@ -106,8 +112,9 @@ export default function Menu() {
                 variant="outline"
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((prev) => prev - 1)}
+                className="cursor-pointer"
               >
-                Previous
+                <ChevronLeft/>
               </Button>
 
               <span className="font-medium text-gray-700">
@@ -118,10 +125,12 @@ export default function Menu() {
                 variant="outline"
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((prev) => prev + 1)}
+                className="cursor-pointer"
               >
-                Next
+                <ChevronRight/>
               </Button>
             </div>
+            
           </>
         )}
       </main>
