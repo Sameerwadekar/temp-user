@@ -1,46 +1,21 @@
-import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import MenuCard from "../components/ui/MenuCard"
-import { ChevronLeft, ChevronRight, Funnel } from "lucide-react";
-import FilterSheet from './ui/FilterSheet'
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import FilterSheet from "./ui/FilterSheet";
+import { useMenu } from "./Context/MenuContext";
 
 export default function Menu() {
-  const [categories, setCategories] = useState([]);
-  const [meals, setMeals] = useState([]);
-  const [selectedCat, setSelectedCat] = useState("Dessert");
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const itemsPerPage = 12;
-
-  // Fetch all categories
-  useEffect(() => {
-    fetch("https://www.themealdb.com/api/json/v1/1/categories.php")
-      .then((res) => res.json())
-      .then((data) => setCategories(data.categories))
-      .catch((err) => console.error(err));
-  }, []);
-
-  // Fetch meals for selected category
-  useEffect(() => {
-    setLoading(true);
-    fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${selectedCat}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setMeals(data.meals || []);
-        setCurrentPage(1); // reset to page 1 when category changes
-        setLoading(false);
-      })
-      .catch((err) => console.error(err));
-  }, [selectedCat]);
-
-  // Pagination logic
-  const indexOfLast = currentPage * itemsPerPage;
-  const indexOfFirst = indexOfLast - itemsPerPage;
-  const currentMeals = meals.slice(indexOfFirst, indexOfLast);
-  const totalPages = Math.ceil(meals.length / itemsPerPage);
+  const {
+    categories,
+    selectedCat,
+    setSelectedCat,
+    loading,
+    currentMeals,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+  } = useMenu();
 
   return (
     <div className="flex">
@@ -68,13 +43,16 @@ export default function Menu() {
           ))}
         </ul>
       </aside>
-      {/* filter icon */}
-      
 
-      {/* Main Menu Items */}
+      {/* Filter Icon for Small Screens */}
+      <div className="md:hidden absolute top-[90px] right-5">
+        <FilterSheet />
+      </div>
+
+      {/* Main Content */}
       <main className="flex-1 p-6">
         <h1 className="text-2xl font-bold mb-4">{selectedCat} Menu</h1>
-          <div className=" md:hidden absolute top-[90px] right-5"><FilterSheet/></div>
+
         {loading ? (
           <div className="grid grid-cols-4 gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
@@ -102,7 +80,6 @@ export default function Menu() {
                     </Button>
                   </CardContent>
                 </Card>
-                // <MenuCard meal={meal}/>
               ))}
             </div>
 
@@ -112,9 +89,8 @@ export default function Menu() {
                 variant="outline"
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((prev) => prev - 1)}
-                className="cursor-pointer"
               >
-                <ChevronLeft/>
+                <ChevronLeft />
               </Button>
 
               <span className="font-medium text-gray-700">
@@ -125,12 +101,10 @@ export default function Menu() {
                 variant="outline"
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((prev) => prev + 1)}
-                className="cursor-pointer"
               >
-                <ChevronRight/>
+                <ChevronRight />
               </Button>
             </div>
-            
           </>
         )}
       </main>
