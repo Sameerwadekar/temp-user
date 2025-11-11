@@ -1,5 +1,7 @@
 package com.learn.temp_backend.entities;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,17 +12,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Product {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
-	
-	@Column(nullable = false,length = 100)
+	@Column(nullable = false,length = 50)
 	private String name;
-	
 	@Column(nullable = false)
-	private int price;
+	private BigDecimal price;
+	@Column
+	private String description;
 }
