@@ -11,9 +11,12 @@ export function MenuProvider({ children }) {
   const itemsPerPage = 12;
 
   useEffect(() => {
-    fetch("https://www.themealdb.com/api/json/v1/1/categories.php")
+    fetch("http://localhost:8080/categories")
       .then((res) => res.json())
-      .then((data) => setCategories(data.categories))
+      .then((data) => {
+        setCategories(data["_embedded"]["categories"])
+        console.log(data);
+      })
       .catch((err) => console.error(err));
   }, []);
 

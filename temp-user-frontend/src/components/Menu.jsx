@@ -38,7 +38,7 @@ export default function Menu() {
                 alt={cat.strCategory}
                 className="w-6 h-6 rounded"
               />
-              {cat.strCategory}
+              {cat.name}
             </li>
           ))}
         </ul>
