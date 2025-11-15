@@ -17,7 +17,7 @@ export function MenuProvider({ children }) {
         setCategories(data["_embedded"]["categories"])
         console.log(data);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error(err))
   }, []);
 
   // Fetch meals for selected category

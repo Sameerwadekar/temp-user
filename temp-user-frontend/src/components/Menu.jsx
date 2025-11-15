@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import FilterSheet from "./ui/FilterSheet";
 import { useMenu } from "./Context/MenuContext";
+import Loader from "@/components/ui/Loader";
 
 export default function Menu() {
   const {
@@ -50,14 +51,12 @@ export default function Menu() {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 p-6">
+      <main className="flex-1 p-6 ">
         <h1 className="text-2xl font-bold mb-4">{selectedCat} Menu</h1>
 
         {loading ? (
-          <div className="grid grid-cols-4 gap-6">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <Skeleton key={i} className="h-64 w-full rounded-xl" />
-            ))}
+          <div className="flex justify-center items-center w-full h-[60vh]">
+            <Loader />
           </div>
         ) : currentMeals.length === 0 ? (
           <p className="text-gray-500">No meals available for this category.</p>
