@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Info } from "lucide-react";
 import FilterSheet from "./ui/FilterSheet";
 import { useMenu } from "./Context/MenuContext";
 import Loader from "@/components/ui/Loader";
+import HoverCardMediaDemo from "./ui/tooltip";
 
 export default function Menu() {
   const {
@@ -62,20 +63,32 @@ export default function Menu() {
           <p className="text-gray-500">No meals available for this category.</p>
         ) : (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ">
               {currentMeals.map((meal) => (
-                <Card key={meal.idMeal} className="overflow-hidden">
+                <Card
+                  key={meal.idMeal}
+                  className="overflow-hidden "
+                >
                   <img
                     src={meal.strMealThumb}
                     alt={meal.strMeal}
-                    className="w-full h-40 object-cover"
+                    className="w-full h-40 object-cover  mt-0"
                   />
-                  <CardContent className="p-4">
+                  <CardContent className="">
+                    <div className="flex justify-between  items-center">
+                      <h3 className="font-semibold text-sm mb-2 line-clamp-1">
+                        {meal.strMeal}
+                      </h3>
+                      <HoverCardMediaDemo
+                        imgLink={meal.strMealThumb}
+                        title={meal.strMeal}
+                      />
+                    </div>
                     <h3 className="font-semibold text-sm mb-2 line-clamp-1">
-                      {meal.strMeal}
+                      RS. 234
                     </h3>
                     <Button className="w-full bg-red-500 hover:bg-red-600 text-white">
-                      View Details
+                      Add To Cart
                     </Button>
                   </CardContent>
                 </Card>
