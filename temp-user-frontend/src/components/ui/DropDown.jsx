@@ -34,7 +34,7 @@ export function DropdownMenuDialog() {
     <>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <Button aria-label="Open menu" size="icon-sm">
+          <Button aria-label="Open menu" size="icon-sm" className="cursor-pointer">
             <CircleUserRound />
           </Button>
         </DropdownMenuTrigger>
@@ -50,7 +50,7 @@ export function DropdownMenuDialog() {
         </DropdownMenuContent>
       </DropdownMenu>
      
-      <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+      {/* <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Share File</DialogTitle>
@@ -85,7 +85,7 @@ export function DropdownMenuDialog() {
             <Button type="submit">Send Invite</Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </>
   );
 }

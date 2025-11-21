@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, Info } from "lucide-react";
 import FilterSheet from "./ui/FilterSheet";
 import { useMenu } from "./Context/MenuContext";
 import Loader from "@/components/ui/Loader";
-import HoverCardMediaDemo from "./ui/tooltip";
+import DialogStickyFooterDemo from "./MealDialog";
 
 export default function Menu() {
   const {
@@ -16,7 +16,7 @@ export default function Menu() {
     currentPage,
     setCurrentPage,
     totalPages,
-    fetchProductsByCategory
+    fetchProductsByCategory,
   } = useMenu();
 
   return (
@@ -47,7 +47,7 @@ export default function Menu() {
       </aside>
 
       {/* Filter Icon for Small Screens */}
-      <div className="md:hidden absolute top-[90px] right-5">
+      <div className="block sm:hidden absolute top-[90px] right-5">
         <FilterSheet />
       </div>
 
@@ -65,10 +65,7 @@ export default function Menu() {
           <>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ">
               {currentMeals.map((meal) => (
-                <Card
-                  key={meal.idMeal}
-                  className="overflow-hidden "
-                >
+                <Card key={meal.idMeal} className="overflow-hidden ">
                   <img
                     src="https://cdn.pixabay.com/photo/2016/08/18/00/37/ice-1601932_960_720.jpg"
                     alt={meal.strMeal}
@@ -79,9 +76,9 @@ export default function Menu() {
                       <h3 className="font-semibold text-sm mb-2 line-clamp-1">
                         {meal.name}
                       </h3>
-                      <HoverCardMediaDemo
+                      <DialogStickyFooterDemo
                         imgLink={meal.strMealThumb}
-                        title={meal.strMeal}
+                        title={meal.name}
                       />
                     </div>
                     <h3 className="font-semibold text-sm mb-2 line-clamp-1">
