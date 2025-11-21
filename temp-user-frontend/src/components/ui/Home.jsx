@@ -25,7 +25,7 @@ const Home = () => {
               <p>Flavorful, 100% dairy free.</p>
             </div>
             <div className="my-2 py-2 ">
-              <Button className={"bg-[#01693a]"} size="lg" onClick={()=> navigate("/menu")}>
+              <Button className={"bg-[#01693a] cursor-pointer"} size="lg" onClick={()=> navigate("/menu")}>
                 Shop Now <ArrowRight />
               </Button>
             </div>

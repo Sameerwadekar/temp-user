@@ -4,7 +4,11 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { useMenu } from "../Context/MenuContext";
 
 export default function FilterSheet() {
-  const { categories, selectedCat, setSelectedCat } = useMenu();
+  const {
+    categories,
+    selectedCat,
+    fetchProductsByCategory
+  } = useMenu();
 
   return (
     <Sheet>
@@ -22,7 +26,7 @@ export default function FilterSheet() {
           {categories.map((cat) => (
             <li
               key={cat.idCategory}
-              onClick={() => setSelectedCat(cat.strCategory)}
+              onClick={() => fetchProductsByCategory(cat._links.products.href)}
               className={`cursor-pointer flex items-center gap-2 p-2 rounded-md hover:bg-red-100 ${
                 selectedCat === cat.strCategory
                   ? "text-red-500 font-bold"
@@ -34,7 +38,7 @@ export default function FilterSheet() {
                 alt={cat.strCategory}
                 className="w-6 h-6 rounded"
               />
-              {cat.strCategory}
+              {cat.name}
             </li>
           ))}
         </ul>

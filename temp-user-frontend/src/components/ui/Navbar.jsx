@@ -26,7 +26,8 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { DropdownMenuDialog } from "./DropDown";
-import { useNavigate } from "react-router-dom";
+import { Link, Links, useNavigate } from "react-router-dom";
+
 
 // Simple logo component for the navbar
 const Logo = () => {
@@ -41,8 +42,8 @@ const Logo = () => {
 
 // Default navigation links
 const defaultNavigationLinks = [
-  { href: "#", label: "Home" },
-  { href: "#", label: "Menu" },
+  { href: "#", label: "Home",path:"/" },
+  { href: "#", label: "Menu",path:"/menu" },
   { href: "#", label: "Special Offers" },
 ];
 
@@ -146,11 +147,9 @@ export const Navbar04 = React.forwardRef(
                     {navigationLinks.map((link, index) => (
                       <NavigationMenuItem key={index}>
                         <NavigationMenuLink
-                          href={link.href}
-                          onClick={(e) => e.preventDefault()}
                           className="text-muted-foreground hover:text-primary py-1.5 font-medium transition-colors cursor-pointer group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
                         >
-                          {link.label}
+                          <Link to={link.path}>{link.label}</Link>
                         </NavigationMenuLink>
                       </NavigationMenuItem>
                     ))}
@@ -179,7 +178,7 @@ export const Navbar04 = React.forwardRef(
               <div className="flex items-center gap-3">
                 <Button
                   size="sm"
-                  className="text-sm font-medium px-4 h-9 rounded-md shadow-sm"
+                  className="text-sm font-medium px-4 h-9 rounded-md shadow-sm cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();
                     if (onCartClick) onCartClick();
@@ -187,9 +186,9 @@ export const Navbar04 = React.forwardRef(
                 >
                   <ShoppingCart />
                 </Button>
-                <div>
+                <Button size="sm" asChild  className="text-sm font-medium px-4 h-9 rounded-md shadow-sm ">
                   <DropdownMenuDialog />
-                </div>
+                </Button>
               </div>
             )}
           </div>
@@ -199,9 +198,9 @@ export const Navbar04 = React.forwardRef(
           <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-md md:hidden">
             <ul className="flex justify-around items-center h-14">
               {[
-                { label: "Home", icon: <House />, link: "#" },
+                { label: "Home", icon: <House />, link: "/" },
                 { label: "Offers", icon: <Gift />, link: "#" },
-                { label: "Menu", icon: <ShoppingBasket />, link: "#" },
+                { label: "Menu", icon: <ShoppingBasket />, link: "/menu" },
                 { label: "Cart", icon: <ShoppingCart />, link: "#" },
                 { label: "Profile", icon: <CircleUserRound />, link: "/login" },
               ].map((item, i) => (
@@ -211,20 +210,15 @@ export const Navbar04 = React.forwardRef(
                     className="flex flex-col items-center text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
                     <span
-                      className="text-lg"
-                      onClick={() => {
-                        navigate(item.link);
-                      }}
+                      className="text-lg cursor-pointer"
                     >
-                      {item.icon}
+                      <Link to={item.link}>{item.icon}</Link>
                     </span>
                     <span
-                      className="text-[11px]"
-                      onClick={() => {
-                        navigate(item.link);
-                      }}
+                      className="text-[11px] cursor-pointer"
+                      
                     >
-                      {item.label}
+                      <Link to={item.link}>{item.label}</Link>
                     </span>
                   </button>
                 </li>
