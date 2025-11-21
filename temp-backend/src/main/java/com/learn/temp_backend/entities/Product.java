@@ -26,6 +26,7 @@ public class Product {
 	private BigDecimal price;
 	@Column
 	private String description;
+	private boolean available;
 	@ManyToOne
 	private Category category;
 }
