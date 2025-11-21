@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
-
 export function SignupForm({ className, ...props }) {
   const {
     register,
@@ -20,11 +19,24 @@ export function SignupForm({ className, ...props }) {
   } = useForm();
   const onSubmit = (data) => {
     console.log("Form Data:", data);
+    fetch("http://localhost:8080/users/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((res) => {
+        if (!res.ok) throw new errors("Failed to register user");
+        return res.json();
+      })
+      .then((data) => console.log(data))
+      .catch((error) => console.log(error));
   };
   return (
     <div className={cn("flex flex-col gap-6 mt-5", className)} {...props}>
       <div className="overflow-hidden p-0 flex flex-col justify-center items-center w-full">
-        <CardContent className=" w-full md:w-1/3">
+        <CardContent className=" w-full md:w-full lg:w-1/2">
           <form onSubmit={handleSubmit(onSubmit)} className="p-6 md:p-8">
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
@@ -33,6 +45,24 @@ export function SignupForm({ className, ...props }) {
                   Enter your email below to create your account
                 </p>
               </div>
+              <Field>
+                <FieldLabel htmlFor="name">Name</FieldLabel>
+                <Input
+                  type="text"
+                  {...register("name", {
+                    required: "Name is required",
+                    minLength: {
+                      value: 3,
+                      message: "Name Must Be 3 letter",
+                    },
+                  })}
+                />
+                {errors.name && (
+                  <span className="text-red-500 text-sm">
+                    {errors.name.message}
+                  </span>
+                )}
+              </Field>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input

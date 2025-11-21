@@ -20,18 +20,25 @@ export function MenuProvider({ children }) {
       .catch((err) => console.error(err))
   }, []);
 
-  // Fetch meals for selected category
+  //fetch all meals
   useEffect(() => {
     setLoading(true);
-    fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${selectedCat}`)
+    fetch(`http://localhost:8080/products`)
       .then((res) => res.json())
       .then((data) => {
-        setMeals(data.meals || []);
-        setCurrentPage(1); // reset to page 1 when category changes
+        setMeals(data);
+        setCurrentPage(1);
         setLoading(false);
       })
       .catch((err) => console.error(err));
-  }, [selectedCat]);
+  }, []);
+
+  const fetchProductsByCategory = (link) =>{
+    fetch(link)
+    .then(res=>res.json())
+    .then(data => setMeals(data["_embedded"]["products"]))
+    .catch(err => console.log(err))
+  }
 
   // Pagination logic
   const indexOfLast = currentPage * itemsPerPage;
@@ -51,6 +58,7 @@ export function MenuProvider({ children }) {
         setCurrentPage,
         currentMeals,
         totalPages,
+        fetchProductsByCategory
       }}
     >
       {children}
