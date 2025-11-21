@@ -11,12 +11,12 @@ export default function Menu() {
   const {
     categories,
     selectedCat,
-    setSelectedCat,
     loading,
     currentMeals,
     currentPage,
     setCurrentPage,
     totalPages,
+    fetchProductsByCategory
   } = useMenu();
 
   return (
@@ -28,7 +28,7 @@ export default function Menu() {
           {categories.map((cat) => (
             <li
               key={cat.idCategory}
-              onClick={() => setSelectedCat(cat.strCategory)}
+              onClick={() => fetchProductsByCategory(cat._links.products.href)}
               className={`cursor-pointer flex items-center gap-2 p-2 rounded-md hover:bg-red-100 ${
                 selectedCat === cat.strCategory
                   ? "text-red-500 font-bold"
@@ -70,14 +70,14 @@ export default function Menu() {
                   className="overflow-hidden "
                 >
                   <img
-                    src={meal.strMealThumb}
+                    src="https://cdn.pixabay.com/photo/2016/08/18/00/37/ice-1601932_960_720.jpg"
                     alt={meal.strMeal}
                     className="w-full h-40 object-cover  mt-0"
                   />
                   <CardContent className="">
                     <div className="flex justify-between  items-center">
                       <h3 className="font-semibold text-sm mb-2 line-clamp-1">
-                        {meal.strMeal}
+                        {meal.name}
                       </h3>
                       <HoverCardMediaDemo
                         imgLink={meal.strMealThumb}
@@ -85,7 +85,7 @@ export default function Menu() {
                       />
                     </div>
                     <h3 className="font-semibold text-sm mb-2 line-clamp-1">
-                      RS. 234
+                      Rs.{meal.price}
                     </h3>
                     <Button className="w-full bg-red-500 hover:bg-red-600 text-white">
                       Add To Cart
