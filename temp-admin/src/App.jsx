@@ -1,15 +1,26 @@
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Layout from "./components/common/Layout";
+import Login from "./components/user/Login";
+import Orders from "./components/Orders";
+import Product from "./components/Product";
+
 
 function App() {
+  const routes = createBrowserRouter([
+    {
+      path:"",
+      element:<Layout/>,
+      children:[
+        {index:true,element:<Login/>},
+        {path:"orders",element:<Orders/>},
+        {path:"products",element:<Product/>}
+      ]
+    }
+  ])
   return (
-    <div className="container mx-auto p-8">
-      <Card className="p-6">
-        <h1 className="text-2xl font-bold mb-4">Vite + shadcn/ui</h1>
-        <Button>Get started</Button>
-      </Card>
-    </div>
-  );
-}
+  <>
+    <RouterProvider router={routes}/>
+  </>
+)}
 
 export default App;
