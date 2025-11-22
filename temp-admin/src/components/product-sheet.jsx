@@ -1,5 +1,4 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
 import { PlusIcon } from "lucide-react";
 
 import {
@@ -16,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import {
   Sheet,
   SheetClose,
@@ -26,17 +26,15 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useMenu } from "./context/MenuContext";
+import SelectCategory from "./SelectCategory";
 
-const data = [
-  { id: "1", name: "Shang Chain", amount: 699, status: "success", email: "shang07@yahoo.com" },
-  { id: "2", name: "Kevin Lincoln", amount: 242, status: "success", email: "kevinli09@gmail.com" },
-  { id: "3", name: "Milton Rose", amount: 655, status: "processing", email: "rose96@gmail.com" },
-  { id: "4", name: "Silas Ryan", amount: 874, status: "success", email: "silas22@gmail.com" },
-  { id: "5", name: "Ben Tenison", amount: 541, status: "failed", email: "bent@hotmail.com" },
-];
 
-// ------------ TABLE COLUMNS ----------
+// ======================
+//   TABLE COLUMNS
+// ======================
 export const columns = [
   {
     id: "select",
@@ -47,52 +45,67 @@ export const columns = [
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
       />
     ),
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
       />
     ),
     enableSorting: false,
     enableHiding: false,
+    size: 20,
   },
+
   {
     header: "Name",
     accessorKey: "name",
-    cell: ({ row }) => <div className="font-medium">{row.getValue("name")}</div>,
+    size: 70,
+    cell: ({ row }) => (
+      <div className="font-medium w-[150px] break-words">
+        {row.getValue("name")}
+      </div>
+    ),
   },
+
   {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("status")}</div>,
+    header: "Description",
+    accessorKey: "description",
+    size: 300,
+    cell: ({ row }) => (
+      <div className="font-medium w-[300px] overflow-hidden">
+        {row.getValue("description")}
+      </div>
+    ),
   },
+
   {
-    accessorKey: "email",
-    header: "Email",
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+    header: "Stock",
+    accessorKey: "available",
+    size: 50,
+    cell: ({ row }) => (
+      <div className="w-[120px]">
+        {row.getValue("available") ? "Available" : "Not Available"}
+      </div>
+    ),
   },
+
   {
-    accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
+    accessorKey: "price",
+    header: () => <div className="text-right w-[120px]">Amount</div>,
+    size: 50,
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
+      const amount = parseFloat(row.getValue("price"));
+      
 
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
-
-      return <div className="text-right font-medium">{formatted}</div>;
+      return <div className="text-right font-medium w-[120px]">Rs,{amount}</div>;
     },
   },
 ];
 
 const DataTableDemo = () => {
-  const [tableData, setTableData] = useState(data);
+  const {tableData,setTableData} = useMenu();
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
@@ -107,6 +120,8 @@ const DataTableDemo = () => {
     status: "pending",
   });
 
+
+  // Add user handler
   const handleAddUser = () => {
     if (!newUser.name || !newUser.email || !newUser.amount) return;
 
@@ -122,32 +137,59 @@ const DataTableDemo = () => {
     setIsSheetOpen(false);
   };
 
+
+  // Fetch product data
+  useEffect(() => {
+    fetch("http://localhost:8080/product")
+      .then((res) => res.json())
+      .then((data) => setTableData(data["_embedded"]["products"]))
+      .catch((err) => console.log(err));
+  }, []);
+
+  //fetch categories
+  useEffect(()=>{
+    fetch("http://localhost:8080/categories")
+    .then(res=>res.json())
+    .then(data=>console.log(data["_embedded"]["categories"]))
+    .catch(err=>console.log(err))
+  },[])
+
+  // React table config
   const table = useReactTable({
     data: tableData,
     columns,
+    columnResizeMode: "onChange",
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     onGlobalFilterChange: setGlobalFilter,
-    globalFilterFn: "includesString",
-    state: { sorting, columnFilters, columnVisibility, rowSelection, globalFilter },
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+      globalFilter,
+    },
   });
+
 
   return (
     <div className="w-full">
-      <div className="flex justify-between gap-2 py-4 max-sm:flex-col sm:items-center">
+      
+      {/* Search + Add User */}
+      <div className="flex  gap-2 py-4 max-sm:flex-col sm:items-center">
         <Input
           placeholder="Search..."
           value={globalFilter}
           onChange={(e) => setGlobalFilter(e.target.value)}
           className="max-w-2xs"
         />
-
+        <SelectCategory/>
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild>
             <Button variant="outline">
@@ -169,7 +211,11 @@ const DataTableDemo = () => {
               <Input value={newUser.email} onChange={(e) => setNewUser({ ...newUser, email: e.target.value })} />
 
               <Label>Amount</Label>
-              <Input type="number" value={newUser.amount} onChange={(e) => setNewUser({ ...newUser, amount: e.target.value })} />
+              <Input
+                type="number"
+                value={newUser.amount}
+                onChange={(e) => setNewUser({ ...newUser, amount: e.target.value })}
+              />
 
               <Label>Status</Label>
               <Select value={newUser.status} onValueChange={(v) => setNewUser({ ...newUser, status: v })}>
@@ -193,13 +239,17 @@ const DataTableDemo = () => {
         </Sheet>
       </div>
 
-      <div className="rounded-md border">
-        <Table>
+
+      {/* TABLE */}
+      <div className="rounded-md border overflow-x-auto">
+        <Table className="table-fixed">
           <TableHeader>
             {table.getHeaderGroups().map((group) => (
               <TableRow key={group.id}>
                 {group.headers.map((header) => (
-                  <TableHead key={header.id}>{flexRender(header.column.columnDef.header, header.getContext())}</TableHead>
+                  <TableHead key={header.id} className="font-semibold border border-amber-300" style={{ width: `${header.column.getSize()}px` }}>
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
                 ))}
               </TableRow>
             ))}
@@ -210,7 +260,9 @@ const DataTableDemo = () => {
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                    <TableCell key={cell.id} style={{ width: `${cell.column.getSize()}px` }}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
                   ))}
                 </TableRow>
               ))
