@@ -10,5 +10,5 @@ import com.learn.temp_backend.entities.Product;
 
 @CrossOrigin(origins = "http://localhost:5173/")
 public interface CategoryRepositary extends JpaRepository<Category, Integer> {
-//	List<Product> findByIdAndAvailableTrue();
+
 }
