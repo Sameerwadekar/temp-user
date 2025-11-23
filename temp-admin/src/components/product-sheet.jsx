@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState} from "react";
 import { PlusIcon } from "lucide-react";
 
 import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
@@ -14,7 +13,13 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import {
   Sheet,
@@ -27,14 +32,18 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useMenu } from "./context/MenuContext";
 import SelectCategory from "./SelectCategory";
+import { useForm,Controller} from "react-hook-form";
 
-
-// ======================
-//   TABLE COLUMNS
-// ======================
 export const columns = [
   {
     id: "select",
@@ -97,15 +106,16 @@ export const columns = [
     size: 50,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("price"));
-      
 
-      return <div className="text-right font-medium w-[120px]">Rs,{amount}</div>;
+      return (
+        <div className="text-right font-medium w-[120px]">Rs,{amount}</div>
+      );
     },
   },
 ];
 
 const DataTableDemo = () => {
-  const {tableData,setTableData} = useMenu();
+  const { tableData ,category } = useMenu();
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
@@ -113,46 +123,6 @@ const DataTableDemo = () => {
   const [rowSelection, setRowSelection] = useState({});
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  const [newUser, setNewUser] = useState({
-    name: "",
-    email: "",
-    amount: "",
-    status: "pending",
-  });
-
-
-  // Add user handler
-  const handleAddUser = () => {
-    if (!newUser.name || !newUser.email || !newUser.amount) return;
-
-    const newEntry = {
-      id: String(tableData.length + 1),
-      ...newUser,
-      amount: parseFloat(newUser.amount),
-    };
-
-    setTableData([...tableData, newEntry]);
-
-    setNewUser({ name: "", email: "", amount: "", status: "pending" });
-    setIsSheetOpen(false);
-  };
-
-
-  // Fetch product data
-  useEffect(() => {
-    fetch("http://localhost:8080/product")
-      .then((res) => res.json())
-      .then((data) => setTableData(data["_embedded"]["products"]))
-      .catch((err) => console.log(err));
-  }, []);
-
-  //fetch categories
-  useEffect(()=>{
-    fetch("http://localhost:8080/categories")
-    .then(res=>res.json())
-    .then(data=>console.log(data["_embedded"]["categories"]))
-    .catch(err=>console.log(err))
-  },[])
 
   // React table config
   const table = useReactTable({
@@ -165,7 +135,6 @@ const DataTableDemo = () => {
     onRowSelectionChange: setRowSelection,
     onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     state: {
@@ -177,10 +146,30 @@ const DataTableDemo = () => {
     },
   });
 
+  const {
+    register,
+    watch,
+    formState: { errors },
+    handleSubmit,
+    control
+  } = useForm();
+
+  const onSubmit = (data) => {
+    console.log(data);
+    fetch("http://localhost:8080/product",{
+      method:"POST",
+      headers: {
+      "Content-Type":"application/json"
+      },
+      body:JSON.stringify(data)
+    })
+    .then(res=>res.json())
+    .then(data=>console.log(data))
+    .catch(err=>console.log(err))
+  };
 
   return (
     <div className="w-full">
-      
       {/* Search + Add User */}
       <div className="flex  gap-2 py-4 max-sm:flex-col sm:items-center">
         <Input
@@ -189,56 +178,85 @@ const DataTableDemo = () => {
           onChange={(e) => setGlobalFilter(e.target.value)}
           className="max-w-2xs"
         />
-        <SelectCategory/>
+        <SelectCategory />
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild>
             <Button variant="outline">
-              <PlusIcon /> Add User
+              <PlusIcon /> Add Product
             </Button>
           </SheetTrigger>
 
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>Add New User</SheetTitle>
-              <SheetDescription>Fill user details</SheetDescription>
+              <SheetTitle>Add New Product</SheetTitle>
+              <SheetDescription>Fill Product details</SheetDescription>
             </SheetHeader>
 
             <div className="grid gap-4 px-4">
-              <Label>Name</Label>
-              <Input value={newUser.name} onChange={(e) => setNewUser({ ...newUser, name: e.target.value })} />
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <Label>Product Name</Label>
+                <Input
+                  type="text"
+                  {...register("name", {
+                    required: true,
+                  })}
+                />
 
-              <Label>Email</Label>
-              <Input value={newUser.email} onChange={(e) => setNewUser({ ...newUser, email: e.target.value })} />
+                <Label>Description</Label>
+                <Input
+                  type="description"
+                  {...register("description", {
+                    required: true,
+                  })}
+                />
 
-              <Label>Amount</Label>
-              <Input
-                type="number"
-                value={newUser.amount}
-                onChange={(e) => setNewUser({ ...newUser, amount: e.target.value })}
-              />
+                <Label>Price</Label>
+                <Input
+                  type="number"
+                  {...register("price", {
+                    required: true,
+                  })}
+                />
 
-              <Label>Status</Label>
-              <Select value={newUser.status} onValueChange={(v) => setNewUser({ ...newUser, status: v })}>
-                <SelectTrigger><SelectValue placeholder="Select Status" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="processing">Processing</SelectItem>
-                  <SelectItem value="success">Success</SelectItem>
-                  <SelectItem value="failed">Failed</SelectItem>
-                </SelectContent>
-              </Select>
+                <Label>Category</Label>
+
+                <Controller
+                  name="category"
+                  control={control}
+                  rules={{ required: "Category is required" }}
+                  render={({ field }) => (
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Category" />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        {category.map((cat) => (
+                          <SelectItem
+                            key={cat._links.self.href}
+                            value={cat._links.category.href}
+                          >
+                            {cat.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                <SheetFooter>
+                  <Button type="submit">Add</Button>
+                  <SheetClose asChild>
+                    <Button variant="outline">Cancel</Button>
+                  </SheetClose>
+                </SheetFooter>
+              </form>
             </div>
-
-            <SheetFooter>
-              <Button onClick={handleAddUser}>Add</Button>
-              <SheetClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </SheetClose>
-            </SheetFooter>
           </SheetContent>
         </Sheet>
       </div>
-
 
       {/* TABLE */}
       <div className="rounded-md border overflow-x-auto">
@@ -247,8 +265,15 @@ const DataTableDemo = () => {
             {table.getHeaderGroups().map((group) => (
               <TableRow key={group.id}>
                 {group.headers.map((header) => (
-                  <TableHead key={header.id} className="font-semibold border border-amber-300" style={{ width: `${header.column.getSize()}px` }}>
-                    {flexRender(header.column.columnDef.header, header.getContext())}
+                  <TableHead
+                    key={header.id}
+                    className="font-semibold border border-amber-300"
+                    style={{ width: `${header.column.getSize()}px` }}
+                  >
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -260,8 +285,14 @@ const DataTableDemo = () => {
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} style={{ width: `${cell.column.getSize()}px` }}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <TableCell
+                      key={cell.id}
+                      style={{ width: `${cell.column.getSize()}px` }}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -275,6 +306,7 @@ const DataTableDemo = () => {
             )}
           </TableBody>
         </Table>
+        
       </div>
     </div>
   );
