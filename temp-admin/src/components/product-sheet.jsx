@@ -1,4 +1,4 @@
-import { useState} from "react";
+import { useState } from "react";
 import { PlusIcon } from "lucide-react";
 
 import {
@@ -10,7 +10,6 @@ import {
 } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -42,89 +41,87 @@ import {
 } from "@/components/ui/table";
 import { useMenu } from "./context/MenuContext";
 import SelectCategory from "./SelectCategory";
-import { useForm,Controller} from "react-hook-form";
-
-export const columns = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-    size: 20,
-  },
-
-  {
-    header: "Name",
-    accessorKey: "name",
-    size: 70,
-    cell: ({ row }) => (
-      <div className="font-medium w-[150px] break-words">
-        {row.getValue("name")}
-      </div>
-    ),
-  },
-
-  {
-    header: "Description",
-    accessorKey: "description",
-    size: 300,
-    cell: ({ row }) => (
-      <div className="font-medium w-[300px] overflow-hidden">
-        {row.getValue("description")}
-      </div>
-    ),
-  },
-
-  {
-    header: "Stock",
-    accessorKey: "available",
-    size: 50,
-    cell: ({ row }) => (
-      <div className="w-[120px]">
-        {row.getValue("available") ? "Available" : "Not Available"}
-      </div>
-    ),
-  },
-
-  {
-    accessorKey: "price",
-    header: () => <div className="text-right w-[120px]">Amount</div>,
-    size: 50,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("price"));
-
-      return (
-        <div className="text-right font-medium w-[120px]">Rs,{amount}</div>
-      );
-    },
-  },
-];
+import { useForm, Controller } from "react-hook-form";
 
 const DataTableDemo = () => {
-  const { tableData ,category } = useMenu();
+  const { tableData, category } = useMenu();
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
 
+  const columns = [
+    {
+      header: "Name",
+      accessorKey: "name",
+      size: 70,
+      cell: ({ row }) => (
+        <div className="font-medium w-[150px] wrap-break-word">
+          {row.getValue("name")}
+        </div>
+      ),
+    },
+
+    {
+      header: "Description",
+      accessorKey: "description",
+      size: 300,
+      cell: ({ row }) => (
+        <div className="font-medium w-[300px] overflow-hidden">
+          {row.getValue("description")}
+        </div>
+      ),
+    },
+
+    {
+      header: "Stock",
+      accessorKey: "available",
+      size: 50,
+      cell: ({ row }) => (
+        <div className="w-[120px]">
+          {row.getValue("available") ? "Available" : "Not Available"}
+        </div>
+      ),
+    },
+
+    {
+      accessorKey: "price",
+      header: () => <div className="text-right w-[120px]">Amount</div>,
+      size: 50,
+      cell: ({ row }) => {
+        const amount = parseFloat(row.getValue("price"));
+
+        return (
+          <div className="text-right font-medium w-[120px]">Rs,{amount}</div>
+        );
+      },
+    },
+    {
+      id: "select",
+      header: () => (
+        <div className="text-right w-[120px] flex justify-center items-center">
+          Update
+        </div>
+      ),
+      size: 50,
+      cell: ({row}) => (
+        <Button
+          onClick={() => {
+            setEditingProduct(row.original);
+            setIsSheetOpen(true);
+          }}
+        >
+          Update
+        </Button>
+      ),
+    },
+  ];
 
   // React table config
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: tableData,
     columns,
@@ -146,26 +143,20 @@ const DataTableDemo = () => {
     },
   });
 
-  const {
-    register,
-    watch,
-    formState: { errors },
-    handleSubmit,
-    control
-  } = useForm();
+  const { register, handleSubmit, control } = useForm();
 
   const onSubmit = (data) => {
     console.log(data);
-    fetch("http://localhost:8080/product",{
-      method:"POST",
+    fetch("http://localhost:8080/product", {
+      method: "POST",
       headers: {
-      "Content-Type":"application/json"
+        "Content-Type": "application/json",
       },
-      body:JSON.stringify(data)
+      body: JSON.stringify(data),
     })
-    .then(res=>res.json())
-    .then(data=>console.log(data))
-    .catch(err=>console.log(err))
+      .then((res) => res.json())
+      .then((data) => console.log(data))
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -217,9 +208,29 @@ const DataTableDemo = () => {
                     required: true,
                   })}
                 />
+                <Label>Stock</Label>
+                <Controller
+                  name="available"
+                  control={control}
+                  rules={{ required: "stock is required" }}
+                  render={({ field }) => (
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select availability" />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        <SelectItem value="true">Available</SelectItem>
+                        <SelectItem value="false">Not - Available</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
 
                 <Label>Category</Label>
-
                 <Controller
                   name="category"
                   control={control}
@@ -306,7 +317,6 @@ const DataTableDemo = () => {
             )}
           </TableBody>
         </Table>
-        
       </div>
     </div>
   );
