@@ -7,12 +7,16 @@ export function MenuProvider({ children }) {
   const [category,setCategory] = useState([]);
 
   // Fetch product data
-  useEffect(() => {
+  function fetchAllProducts() {
     fetch("http://localhost:8080/product")
       .then((res) => res.json())
       .then((data) => setTableData(data["_embedded"]["products"]))
       .catch((err) => console.log(err));
-  }, []);
+  }
+
+  useEffect(()=>{
+    fetchAllProducts();
+  },[])
 
   //fetch categories
   useEffect(() => {
@@ -36,7 +40,8 @@ export function MenuProvider({ children }) {
         setTableData,
         category,
         setCategory,
-        fetchProductsByCategory
+        fetchProductsByCategory,
+        fetchAllProducts
     }}>
         {children}
     </MenuContext.Provider>
