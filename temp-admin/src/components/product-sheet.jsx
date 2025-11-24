@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PlusIcon } from "lucide-react";
 
 import {
@@ -52,6 +52,64 @@ const DataTableDemo = () => {
   const [rowSelection, setRowSelection] = useState({});
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+
+  // const columns = [
+  //   {
+  //     header: "Name",
+  //     accessorKey: "name",
+  //     size: 70,
+  //     cell: ({ row }) => (
+  //       <div className="font-medium w-[150px] wrap-break-word">
+  //         {row.getValue("name")}
+  //       </div>
+  //     ),
+  //   },
+
+  //   {
+  //     header: "Description",
+  //     accessorKey: "description",
+  //     size: 300,
+  //     cell: ({ row }) => (
+  //       <div className="font-medium w-[300px] overflow-hidden">
+  //         {row.getValue("description")}
+  //       </div>
+  //     ),
+  //   },
+
+  //   {
+  //     header: "Stock",
+  //     accessorKey: "available",
+  //     size: 50,
+  //     cell: ({ row }) => (
+  //       <div className="w-[120px]">
+  //         {row.getValue("available") ? "Available" : "Not Available"}
+  //       </div>
+  //     ),
+  //   },
+
+  //   {
+  //     accessorKey: "price",
+  //     header: () => <div className="text-right w-[120px]">Amount</div>,
+  //     cell: ({ row }) => {
+  //       const amount = parseFloat(row.getValue("price"));
+  //       return <div className="text-right font-medium">Rs,{amount}</div>;
+  //     },
+  //   },
+  //   {
+  //     id: "select",
+  //     header: () => <div className="text-center">Update</div>,
+  //     cell: ({ row }) => (
+  //       <Button
+  //         onClick={() => {
+  //           setEditingProduct(row.original);
+  //           setIsSheetOpen(true);
+  //         }}
+  //       >
+  //         Update
+  //       </Button>
+  //     ),
+  //   },
+  // ];
 
   const columns = [
     {
@@ -107,7 +165,7 @@ const DataTableDemo = () => {
         </div>
       ),
       size: 50,
-      cell: ({row}) => (
+      cell: ({ row }) => (
         <Button
           onClick={() => {
             setEditingProduct(row.original);
@@ -119,50 +177,61 @@ const DataTableDemo = () => {
       ),
     },
   ];
-
-  // React table config
-  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: tableData,
     columns,
-    columnResizeMode: "onChange",
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-      globalFilter,
-    },
+    state: { sorting, columnFilters, globalFilter },
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
   });
 
-  const { register, handleSubmit, control } = useForm();
+  const { register, handleSubmit, control, reset } = useForm();
+
+  useEffect(() => {
+    if (editingProduct) {
+      const href = editingProduct._links?.self?.href;
+      const id = href ? href.split("/").pop() : null;
+
+      reset({
+        id,
+        name: editingProduct.name,
+        description: editingProduct.description,
+        price: editingProduct.price,
+        available: editingProduct.available ? "true" : "false",
+        category: editingProduct._links?.category?.href || "",
+      });
+    } else {
+      reset();
+    }
+  }, [editingProduct, reset]);
 
   const onSubmit = (data) => {
-    console.log(data);
-    fetch("http://localhost:8080/product", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+    data.available = data.available === "true";
+
+    const url = data.id
+      ? `http://localhost:8080/product/${data.id}`
+      : "http://localhost:8080/product";
+
+    fetch(url, {
+      method: data.id ? "PUT" : "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     })
       .then((res) => res.json())
-      .then((data) => console.log(data))
-      .catch((err) => console.log(err));
+      .then(() => {
+        setEditingProduct(null);
+        setIsSheetOpen(false);
+      })
+      .catch(console.error);
   };
 
   return (
     <div className="w-full">
-      {/* Search + Add User */}
-      <div className="flex  gap-2 py-4 max-sm:flex-col sm:items-center">
+      <div className="flex gap-2 py-4">
         <Input
           placeholder="Search..."
           value={globalFilter}
@@ -170,8 +239,32 @@ const DataTableDemo = () => {
           className="max-w-2xs"
         />
         <SelectCategory />
-        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-          <SheetTrigger asChild>
+
+        <Sheet
+          open={isSheetOpen}
+          onOpenChange={(open) => {
+            setIsSheetOpen(open);
+            if (!open) {
+              setEditingProduct(null);
+              reset();
+            }
+          }}
+        >
+          <SheetTrigger
+            asChild
+            onClick={() => {
+              setEditingProduct(null);
+              reset({
+                id: "",
+                name: "",
+                description: "",
+                price: "",
+                available: "",
+                category: "",
+              });
+              setIsSheetOpen(true);
+            }}
+          >
             <Button variant="outline">
               <PlusIcon /> Add Product
             </Button>
@@ -179,108 +272,97 @@ const DataTableDemo = () => {
 
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>Add New Product</SheetTitle>
-              <SheetDescription>Fill Product details</SheetDescription>
+              <SheetTitle>
+                {editingProduct ? "Update Product" : "Add New Product"}
+              </SheetTitle>
+              <SheetDescription>Fill Product Details</SheetDescription>
             </SheetHeader>
 
-            <div className="grid gap-4 px-4">
-              <form onSubmit={handleSubmit(onSubmit)}>
-                <Label>Product Name</Label>
-                <Input
-                  type="text"
-                  {...register("name", {
-                    required: true,
-                  })}
-                />
+            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 mt-4">
+              {/* Hidden ID field */}
+              <input type="hidden" {...register("id")} />
 
-                <Label>Description</Label>
-                <Input
-                  type="description"
-                  {...register("description", {
-                    required: true,
-                  })}
-                />
+              <Label>Product Name</Label>
+              <Input type="text" {...register("name", { required: true })} />
 
-                <Label>Price</Label>
-                <Input
-                  type="number"
-                  {...register("price", {
-                    required: true,
-                  })}
-                />
-                <Label>Stock</Label>
-                <Controller
-                  name="available"
-                  control={control}
-                  rules={{ required: "stock is required" }}
-                  render={({ field }) => (
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select availability" />
-                      </SelectTrigger>
+              <Label>Description</Label>
+              <Input
+                type="text"
+                {...register("description", { required: true })}
+              />
 
-                      <SelectContent>
-                        <SelectItem value="true">Available</SelectItem>
-                        <SelectItem value="false">Not - Available</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
+              <Label>Price</Label>
+              <Input type="number" {...register("price", { required: true })} />
 
-                <Label>Category</Label>
-                <Controller
-                  name="category"
-                  control={control}
-                  rules={{ required: "Category is required" }}
-                  render={({ field }) => (
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select Category" />
-                      </SelectTrigger>
+              <Label>Stock</Label>
+              <Controller
+                name="available"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <Select
+                    value={field.value || ""}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select availability" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="true">Available</SelectItem>
+                      <SelectItem value="false">Not Available</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
 
-                      <SelectContent>
-                        {category.map((cat) => (
-                          <SelectItem
-                            key={cat._links.self.href}
-                            value={cat._links.category.href}
-                          >
-                            {cat.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                <SheetFooter>
-                  <Button type="submit">Add</Button>
-                  <SheetClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </SheetClose>
-                </SheetFooter>
-              </form>
-            </div>
+              <Label>Category</Label>
+              <Controller
+                name="category"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <Select
+                    value={field.value || ""}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {category.map((cat) => (
+                        <SelectItem
+                          key={cat._links.self.href}
+                          value={cat._links.self.href}
+                        >
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+
+              <SheetFooter>
+                <Button type="submit">
+                  {editingProduct ? "Update" : "Add"}
+                </Button>
+                <SheetClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </SheetClose>
+              </SheetFooter>
+            </form>
           </SheetContent>
         </Sheet>
       </div>
 
-      {/* TABLE */}
-      <div className="rounded-md border overflow-x-auto">
-        <Table className="table-fixed">
+      {/* TABLE DATA */}
+      <div className="rounded-md border overflow-x-auto scrollbar-thin">
+        <Table className="min-w-full whitespace-normal break-words">
           <TableHeader>
             {table.getHeaderGroups().map((group) => (
               <TableRow key={group.id}>
                 {group.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    className="font-semibold border border-amber-300"
-                    style={{ width: `${header.column.getSize()}px` }}
-                  >
+                  <TableHead key={header.id}>
                     {flexRender(
                       header.column.columnDef.header,
                       header.getContext()
@@ -290,7 +372,6 @@ const DataTableDemo = () => {
               </TableRow>
             ))}
           </TableHeader>
-
           <TableBody>
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
@@ -298,7 +379,7 @@ const DataTableDemo = () => {
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      style={{ width: `${cell.column.getSize()}px` }}
+                      className="whitespace-normal break-words max-w-[200px]"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
