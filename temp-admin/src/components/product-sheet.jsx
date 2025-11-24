@@ -48,68 +48,18 @@ const DataTableDemo = () => {
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
-  const [columnVisibility, setColumnVisibility] = useState({});
-  const [rowSelection, setRowSelection] = useState({});
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [expandedRows, setExpandedRows] = useState({});
 
-  // const columns = [
-  //   {
-  //     header: "Name",
-  //     accessorKey: "name",
-  //     size: 70,
-  //     cell: ({ row }) => (
-  //       <div className="font-medium w-[150px] wrap-break-word">
-  //         {row.getValue("name")}
-  //       </div>
-  //     ),
-  //   },
 
-  //   {
-  //     header: "Description",
-  //     accessorKey: "description",
-  //     size: 300,
-  //     cell: ({ row }) => (
-  //       <div className="font-medium w-[300px] overflow-hidden">
-  //         {row.getValue("description")}
-  //       </div>
-  //     ),
-  //   },
 
-  //   {
-  //     header: "Stock",
-  //     accessorKey: "available",
-  //     size: 50,
-  //     cell: ({ row }) => (
-  //       <div className="w-[120px]">
-  //         {row.getValue("available") ? "Available" : "Not Available"}
-  //       </div>
-  //     ),
-  //   },
-
-  //   {
-  //     accessorKey: "price",
-  //     header: () => <div className="text-right w-[120px]">Amount</div>,
-  //     cell: ({ row }) => {
-  //       const amount = parseFloat(row.getValue("price"));
-  //       return <div className="text-right font-medium">Rs,{amount}</div>;
-  //     },
-  //   },
-  //   {
-  //     id: "select",
-  //     header: () => <div className="text-center">Update</div>,
-  //     cell: ({ row }) => (
-  //       <Button
-  //         onClick={() => {
-  //           setEditingProduct(row.original);
-  //           setIsSheetOpen(true);
-  //         }}
-  //       >
-  //         Update
-  //       </Button>
-  //     ),
-  //   },
-  // ];
+  const toggleRow = (id) => {
+    setExpandedRows((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
 
   const columns = [
     {
@@ -127,11 +77,33 @@ const DataTableDemo = () => {
       header: "Description",
       accessorKey: "description",
       size: 300,
-      cell: ({ row }) => (
-        <div className="font-medium w-[300px] overflow-hidden">
-          {row.getValue("description")}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const desc = row.getValue("description");
+        const isExpanded = expandedRows[row.id];
+        const maxLength = 60;
+
+        return (
+          <div className="flex flex-col gap-1 w-[300px]">
+            <div
+              className={`overflow-hidden wrap-break-word text-sm ${
+                isExpanded ? "max-h-none" : "max-h-12 line-clamp-2"
+              }`}
+            >
+              {desc}
+            </div>
+
+            {desc.length > maxLength && (
+              <button
+                type="button"
+                className="text-blue-600 text-xs underline"
+                onClick={() => toggleRow(row.id)}
+              >
+                {isExpanded ? "Read Less" : "Read More"}
+              </button>
+            )}
+          </div>
+        );
+      },
     },
 
     {
@@ -356,13 +328,18 @@ const DataTableDemo = () => {
       </div>
 
       {/* TABLE DATA */}
-      <div className="rounded-md border overflow-x-auto scrollbar-thin">
-        <Table className="min-w-full whitespace-normal break-words">
-          <TableHeader>
+      <div className="rounded-lg border overflow-x-auto shadow-sm">
+        <Table className="min-w-full table-auto whitespace-normal break-words">
+
+          {/* Sticky Header */}
+          <TableHeader className="bg-gray-100 sticky top-0 z-10">
             {table.getHeaderGroups().map((group) => (
-              <TableRow key={group.id}>
+              <TableRow key={group.id} className="border-b">
                 {group.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead
+                    key={header.id}
+                    className="px-4 py-3 font-semibold text-gray-700"
+                  >
                     {flexRender(
                       header.column.columnDef.header,
                       header.getContext()
@@ -372,14 +349,20 @@ const DataTableDemo = () => {
               </TableRow>
             ))}
           </TableHeader>
+
           <TableBody>
             {table.getRowModel().rows.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+              table.getRowModel().rows.map((row, i) => (
+                <TableRow
+                  key={row.id}
+                  className={`border-b h-[70px] hover:bg-gray-50 ${
+                    i % 2 === 0 ? "bg-white" : "bg-gray-50/50"
+                  }`}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className="whitespace-normal break-words max-w-[200px]"
+                      className="px-4 py-3 whitespace-normal break-words max-w-[250px] text-sm"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -391,8 +374,11 @@ const DataTableDemo = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="text-center">
-                  No results.
+                <TableCell
+                  colSpan={columns.length}
+                  className="text-center py-6 text-gray-500"
+                >
+                  No results found.
                 </TableCell>
               </TableRow>
             )}
