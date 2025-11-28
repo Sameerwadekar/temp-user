@@ -36,7 +36,7 @@ export default function Menu() {
               }`}
             >
               <img
-                src={cat.strCategoryThumb}
+                src="https://media.istockphoto.com/id/1817174766/photo/pink-homemade-ice-cream.jpg?s=2048x2048&w=is&k=20&c=NahMADv-dOSZCOyX_VelNyEkx80EBTRotNnqsY8kz0w="
                 alt={cat.strCategory}
                 className="w-6 h-6 rounded"
               />
@@ -79,6 +79,8 @@ export default function Menu() {
                       <DialogStickyFooterDemo
                         imgLink={meal.strMealThumb}
                         title={meal.name}
+                        description = {meal.description}
+                        price = {meal.price}
                       />
                     </div>
                     <h3 className="font-semibold text-sm mb-2 line-clamp-1">
