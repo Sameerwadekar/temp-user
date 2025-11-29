@@ -1,0 +1,17 @@
+package com.learn.temp_backend.repositary;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.web.bind.annotation.CrossOrigin;
+
+import com.learn.temp_backend.entities.CartItem;
+import com.learn.temp_backend.entities.Product;
+import java.util.Optional;
+
+import com.learn.temp_backend.entities.Cart;
+
+@RepositoryRestResource(path = "cartitem")
+@CrossOrigin
+public interface CartItemRepositary extends JpaRepository<CartItem, Long> {
+	Optional<CartItem> findByCartAndProduct(Cart cart, Product product);
+}
