@@ -3,8 +3,10 @@ import { SignupForm } from "./components/signup-form";
 import Home from "./components/ui/Home";
 import { Navbar04 } from "./components/ui/Navbar";
 import Footer from "./components/Footer";
-import { createBrowserRouter, Outlet,RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import Menu from "./components/Menu";
+import { ToastContainer } from "react-toastify";
+import { LoginProvider } from "./components/Context/LoginContext";
 
 function Layout() {
   return (
@@ -13,7 +15,7 @@ function Layout() {
       <Navbar04 />
 
       {/* Main content grows and pushes footer down */}
-      <main className="flex-grow">
+      <main className="grow">
         <Outlet />
       </main>
 
@@ -26,33 +28,53 @@ function Layout() {
 function App() {
   const router = createBrowserRouter([
     {
-      element: <Layout />,
+      element: (
+        <LoginProvider>
+          <Layout />
+        </LoginProvider>
+      ),
       children: [
         {
           path: "/",
           element: <Home />,
         },
         {
-          path:"/login",
-          element:<LoginForm/>
+          path: "/login",
+          element: <LoginForm />,
         },
         {
-          path:"/signin",
-          element:<SignupForm/>
+          path: "/signin",
+          element: <SignupForm />,
         },
         {
-          path:"/menu",
-          element:<Menu/>
-        }
+          path: "/menu",
+          element: <Menu />,
+        },
       ],
     },
     {
-    path:"*",
-    element: <>404 not Found</>
-    }
+      path: "*",
+      element: <>404 not Found</>,
+    },
   ]);
 
-   return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router} />
+      <ToastContainer
+        position="top-right"
+        autoClose={2000} // 2 seconds
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
+    </>
+  );
 }
 
 export default App;
