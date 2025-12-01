@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft, ChevronRight, Info } from "lucide-react";
 import FilterSheet from "./ui/FilterSheet";
 import { useMenu } from "./Context/MenuContext";

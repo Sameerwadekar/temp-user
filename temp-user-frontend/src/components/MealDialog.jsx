@@ -17,7 +17,7 @@ const DialogStickyFooterDemo = ({ imgLink, title, description,price}) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button variant="outline" className="">
           <Info />
         </Button>
       </DialogTrigger>

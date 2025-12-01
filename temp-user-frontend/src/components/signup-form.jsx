@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 export function SignupForm({ className, ...props }) {
   const {
     register,
@@ -31,12 +32,12 @@ export function SignupForm({ className, ...props }) {
         return res.json();
       })
       .then((data) => console.log(data))
-      .catch((error) => console.log(error));
+      .catch((error) => toast.error(error));
   };
   return (
     <div className={cn("flex flex-col gap-6 mt-5", className)} {...props}>
       <div className="overflow-hidden p-0 flex flex-col justify-center items-center w-full">
-        <CardContent className=" w-full md:w-full lg:w-1/2">
+        <CardContent className=" w-full md:w-full lg:w-1/3">
           <form onSubmit={handleSubmit(onSubmit)} className="p-6 md:p-8">
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
@@ -134,10 +135,10 @@ export function SignupForm({ className, ...props }) {
               <Field>
                 <Button type="submit">Create Account</Button>
               </Field>
-              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
+              {/* <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or continue with
-              </FieldSeparator>
-              <Field className="grid grid-cols-3 gap-4">
+              </FieldSeparator> */}
+              {/* <Field className="grid grid-cols-3 gap-4">
                 <Button variant="outline" type="button">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path
@@ -165,7 +166,7 @@ export function SignupForm({ className, ...props }) {
                   </svg>
                   <span className="sr-only">Sign up with Meta</span>
                 </Button>
-              </Field>
+              </Field> */}
               <FieldDescription className="text-center">
                 Already have an account? <a href="#">Sign in</a>
               </FieldDescription>

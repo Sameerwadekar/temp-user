@@ -16,36 +16,37 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
+import {  useLogin } from "./Context/LoginContext";
 
 export function LoginForm({ className, ...props }) {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm();
+  const {handleLogin} =  useLogin();
   const onSubmit = (data) => {
-    console.log("Form Data:", data);
+    handleLogin(data);
   };
   return (
     <div
       className={cn(
-        "flex flex-col gap-6 justify-center items-center w-full mt-5",
+        "flex flex-col gap-6 mt-5",
         className
       )}
       {...props}
     >
-      <div className="flex flex-col  w-full md:w-1/4">
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
-          <CardDescription>
+      <div className="overflow-hidden p-0 flex flex-col justify-center items-center w-full">
+        <CardHeader className="flex flex-col items-center gap-2 text-center">
+          <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
+          {/* <CardDescription>
             Login with your Apple or Google account
-          </CardDescription>
+          </CardDescription> */}
         </CardHeader>
-        <CardContent>
-          <form className="mt-5" onSubmit={handleSubmit(onSubmit)}>
-            <FieldGroup>
-              <Field>
+        <CardContent className="w-full md:w-full lg:w-1/3">
+          <form className="p-6 md:p-8 mt-5" onSubmit={handleSubmit(onSubmit)}>
+            <FieldGroup className="space-y-6">
+              {/* <Field>
                 <Button variant="outline" type="button">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path
@@ -64,10 +65,10 @@ export function LoginForm({ className, ...props }) {
                   </svg>
                   Login with Google
                 </Button>
-              </Field>
-              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
+              </Field> */}
+              {/* <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or continue with
-              </FieldSeparator>
+              </FieldSeparator> */}
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
@@ -102,6 +103,11 @@ export function LoginForm({ className, ...props }) {
                     required: "Password is required",
                   })}
                 />
+                 {errors.password && (
+                  <span className="text-red-500 text-sm">
+                    {errors.password.message}
+                  </span>
+                )}
               </Field>
               <Field>
                 <Button type="submit">Login</Button>

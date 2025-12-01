@@ -3,9 +3,10 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
 import { MenuProvider } from "./components/Context/MenuContext.jsx";
+import { LoginProvider } from "./components/Context/LoginContext.jsx";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+   <StrictMode>
     <MenuProvider>
       <App />
     </MenuProvider>
