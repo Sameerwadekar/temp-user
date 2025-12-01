@@ -1,7 +1,5 @@
 package com.learn.temp_backend.security;
 
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,8 +29,10 @@ public class SecurityConfig {
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
 		httpSecurity.csrf(csrf -> csrf.disable())
-		.authorizeHttpRequests(req -> req.requestMatchers(HttpMethod.POST,"/users/**")
-		.permitAll().anyRequest().authenticated());
+		.cors(cors -> {})
+		.authorizeHttpRequests(req -> req.requestMatchers(HttpMethod.POST,"/users/**","/auth/login").permitAll()
+		.requestMatchers(HttpMethod.GET, "/product/**", "/products/**", "/categories/**").permitAll()
+		.anyRequest().authenticated());
 		httpSecurity.exceptionHandling(authentication -> authentication.authenticationEntryPoint(authEntryPointJwt));
 		httpSecurity.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 		return httpSecurity.build();

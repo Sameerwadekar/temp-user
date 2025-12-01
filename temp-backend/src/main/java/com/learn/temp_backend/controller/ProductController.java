@@ -24,7 +24,7 @@ import com.learn.temp_backend.service.ProductService;
 
 @RestController
 @RequestMapping("/products")
-@CrossOrigin(origins = "http://localhost:5173/")
+@CrossOrigin
 public class ProductController {
 
     private final ProductRepositary productRepositary;
