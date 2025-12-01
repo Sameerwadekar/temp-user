@@ -7,5 +7,5 @@ import com.learn.temp_backend.entities.Cart;
 
 
 public interface CartService {
-	Cart cartItems(AddToCartDto addToCartDto,String email);
+	Cart addtoCart(AddToCartDto addToCartDto,String email);
 }
