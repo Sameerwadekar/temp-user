@@ -1,0 +1,214 @@
+JwtUtils
+AuthEntryPointJwt
+AuthTokenFilterJava
+//https://drive.google.com/drive/folders/1h8QSCSdatE_uskN-IDT2soFg23soWM1P
+
+Step 0: Dependencies (required for JWT & Security)
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+
+<!-- JWT -->
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-api</artifactId>
+    <version>0.13.0</version>
+</dependency>
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-impl</artifactId>
+    <version>0.13.0</version>
+    <scope>runtime</scope>
+</dependency>
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-jackson</artifactId>
+    <version>0.13.0</version>
+    <scope>runtime</scope>
+</dependency>
+
+then check did you get generate password in console
+
+Step 1: Create Login request & response models
+📌 Files
+LoginRequest.java
+LoginResponse.java
+LoginRequest contains: email + password
+LoginResponse contains: token + user info
+
+Step 2: Implement UserDetailsService
+📌 File
+UserDetailsServiceImpl.java
+This must:
+Load user from DB using email/username
+Return UserDetails object.
+in user entity user must implements userDetails interface and over ride method then only in loadbyusername we will pass userDetails object as child can be also accepted user == userDetails
+
+Step 3: Create JwtUtils
+📌 File
+JwtUtils.java
+This file must do:
+Generate token
+Validate token
+Extract username from token
+remove isEnbaled() add application properties secret and time 
+
+Step 4: Create AuthTokenFilter
+📌 File
+AuthTokenFilter.java
+This runs before every request and must:
+Read token from header
+Validate token using JwtUtils
+Call UserDetailsServiceImpl
+Set authentication in SecurityContext
+inject UserDetailsSericeImpl bean created with @component anonatation
+
+
+step 5 : create AuthEntryPointJwt
+
+Step 6: Configure Spring Security
+📌 File
+SecurityConfig.java
+Must include:
+AuthenticationManager bean
+PasswordEncoder bean
+Permit login/signup endpoints
+Add JWT filter before UsernamePasswordAuthenticationFilter
+
+@Bean
+SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+	httpSecurity.csrf(csrf -> csrf.disable())
+	.authorizeHttpRequests(req -> req
+			.requestMatchers(HttpMethod.POST, "/users/**", "/auth/login")
+			.permitAll()
+			.anyRequest().authenticated())
+	;
+	httpSecurity.exceptionHandling(auth -> auth.authenticationEntryPoint(authEntryPointJwt));
+	httpSecurity.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
+	return httpSecurity.build();
+}
+
+Explain:
+
+@Bean
+SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+➡️ Creates and configures the security rules for the web application.
+
+httpSecurity.csrf(csrf -> csrf.disable())
+➡️ Disables CSRF protection, because JWT authentication does not use browser cookies or sessions, so CSRF is not needed.
+
+.authorizeHttpRequests(req -> req
+    .requestMatchers(HttpMethod.POST, "/users/**", "/auth/login")
+    .permitAll()
+    .anyRequest().authenticated());
+🔹 requestMatchers(HttpMethod.POST,"/users/**","/auth/login").permitAll()
+→ Allows these API endpoints without authentication
+
+httpSecurity.exceptionHandling(authentication -> authentication.authenticationEntryPoint(authEntryPointJwt));
+➡️ If a user tries to access a protected route without token or with invalid token, this:
+
+httpSecurity.exceptionHandling(authentication -> authentication.authenticationEntryPoint(authEntryPointJwt));
+➡️ If a user tries to access a protected route without token or with invalid token, this:
+
+encode password in userSericeImpl
+user.setPassword(this.passwordEncoder.encode(user.getPassword()));
+
+step 7 : 
+AuthController.java
+Must do:
+Accept LoginRequest
+Authenticate using AuthenticationManager
+Generate JWT using JwtUtils
+Return LoginResponse (token + user info)
+
+@RestController
+@RequestMapping("/auth")
+@CrossOrigin
+public class AuthController {
+
+	@Autowired
+	private UserRepositary userRepositary;
+	
+	@Autowired
+	private JwtUtils jwtUtils;
+	
+	@Autowired
+	private AuthenticationManager authenticationManager;
+	
+	@Autowired
+	private ModelMapper modelMapper;
+	
+	@PostMapping("/login")
+	public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest){
+		String email = loginRequest.getEmail();
+		String password = loginRequest.getPassword();
+		
+		Authentication authenticate = null;
+		try {
+			authenticate = authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(email, password));
+		} catch (BadCredentialsException e) {
+			System.out.println("bad credentials");
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}
+		
+		SecurityContextHolder.getContext().setAuthentication(authenticate);
+		User user = (User) authenticate.getPrincipal();
+		String token = jwtUtils.generateTokenFromUsername(user);
+		
+		LoginResponse loginResponse = new LoginResponse();
+		loginResponse.setToken(token);
+		UserDto userDto = modelMapper.map(user, UserDto.class);
+		loginResponse.setUserDto(userDto);
+		
+		return new ResponseEntity<>(loginResponse, HttpStatus.OK);
+	}
+}
+
+
+step 8 : ADDING ROLE
+STEP-1: Create Enum for roles
+	package com.learn.temp_backend.entities;
+
+public enum AppRole {
+	ROLE_USER,
+	ROLE_ADMIN
+}
+
+STEP-2: Create Role Entity
+	public class Role {
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private int roleId;
+	@Enumerated(EnumType.STRING)
+	private AppRole roleName;
+	@OneToMany(mappedBy = "role")
+	private List<User> users;
+}
+
+STEP-3: Add Role field in User Entity
+	@ManyToOne
+	private Role role;
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		// TODO Auto-generated method stub
+		return Arrays.asList(new SimpleGrantedAuthority(role.getRoleName().toString()));
+	}
+STEP-4: Create Role Repository
+	public interface RoleRepositary extends JpaRepository<Role, Integer>{
+	Optional<Role> findByRoleName(AppRole roleName);
+}
+
+STEP 5 : Insert values in database 
+	INSERT INTO role (role_id, role_name)
+VALUES (1, 'ROLE_USER');
+
+INSERT INTO role (role_id, role_name)
+VALUES (2, 'ROLE_ADMIN');
+
+STEP-6: Assign role during user creation in userServiceImpl
+	Role role = roleRepositary.findByRoleName(AppRole.ROLE_USER).orElseThrow(()->new RuntimeException("Role Not Found"));
+
+
+done....
