@@ -1,6 +1,6 @@
 package com.learn.temp_backend.entities;
 
-import java.util.function.LongFunction;
+
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

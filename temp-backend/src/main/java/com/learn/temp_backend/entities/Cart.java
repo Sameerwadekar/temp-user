@@ -24,4 +24,9 @@ public class Cart {
 	private User user;
 	@OneToMany(mappedBy = "cart")
 	private List<CartItem> items;
+	
+	public Cart(User user) {
+	    this.user = user;
+	}
+
 }
