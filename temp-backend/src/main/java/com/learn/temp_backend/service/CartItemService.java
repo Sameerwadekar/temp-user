@@ -5,7 +5,7 @@ import com.learn.temp_backend.dtos.CartDto;
 
 public interface CartItemService {
 	CartDto addtoCart(AddToCartDto addToCartDto);
-	CartDto getCartbyUser(long UserId);
+	CartDto getCartbyUser(String UserId);
 	CartDto updateQuantity(long cartItemId,int qunatity);
 	CartDto removeItem(long cartItemId);
 }

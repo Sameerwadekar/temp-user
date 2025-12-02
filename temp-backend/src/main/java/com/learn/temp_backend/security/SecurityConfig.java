@@ -30,8 +30,10 @@ public class SecurityConfig {
 	SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
 		httpSecurity.csrf(csrf -> csrf.disable())
 		.cors(cors -> {})
-		.authorizeHttpRequests(req -> req.requestMatchers(HttpMethod.POST,"/users/**","/auth/login").permitAll()
-		.requestMatchers(HttpMethod.GET, "/product/**", "/products/**", "/categories/**").permitAll()
+		.authorizeHttpRequests(req -> req.requestMatchers(HttpMethod.POST,"/users/**","/auth/login","/cart/**","/cart-item/**").permitAll()
+		.requestMatchers(HttpMethod.GET, "/product/**", "/products/**", "/categories/**","/cart/**").permitAll()
+		.requestMatchers(HttpMethod.DELETE,"/cart/**").permitAll()
+		.requestMatchers(HttpMethod.PUT,"/cart/**").permitAll()
 		.anyRequest().authenticated());
 		httpSecurity.exceptionHandling(authentication -> authentication.authenticationEntryPoint(authEntryPointJwt));
 		httpSecurity.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);

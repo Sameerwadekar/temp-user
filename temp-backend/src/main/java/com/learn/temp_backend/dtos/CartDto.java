@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CartDto {
 	 private Long cartId;
-	 private Long userId;
+	 private String userId;
 	 private List<CartItemDto> items;
 	 private BigDecimal cartTotal;
 }
