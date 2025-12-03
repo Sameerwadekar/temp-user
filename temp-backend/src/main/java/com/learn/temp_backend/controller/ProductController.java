@@ -1,11 +1,15 @@
 package com.learn.temp_backend.controller;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.http.HttpClient;
 import java.util.List;
 
 import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,17 +19,29 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.util.StreamUtils;
 
 import com.learn.temp_backend.dtos.ProductDto;
+import com.learn.temp_backend.entities.Product;
 import com.learn.temp_backend.repositary.ProductRepositary;
+import com.learn.temp_backend.service.FileService;
 import com.learn.temp_backend.service.ProductService;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 
 @RestController
 @RequestMapping("/products")
 @CrossOrigin
 public class ProductController {
+	@Value("${product.image.path}")
+	private String imagePath;
+	
+	@Autowired
+	private FileService fileService;
 
     private final ProductRepositary productRepositary;
 	@Autowired
@@ -65,4 +81,21 @@ public class ProductController {
 		ProductDto productDto = productService.assignCategory(pid, cid);
 		return new ResponseEntity<ProductDto>(productDto,HttpStatus.OK);
 	}
+	 @PostMapping("/{productId}/image")
+	    public ResponseEntity<String> uploadUserImage(@RequestParam("productImage") MultipartFile image, @PathVariable int productId) throws IOException, java.io.IOException {
+	        String imageName = fileService.uploadFile(image, imagePath);
+	         Product product = productRepositary.findById(productId).get();
+	         System.out.println("ImageName"+imageName);
+	         product.setProductImage(imageName);
+	         productRepositary.save(product);
+	        return new ResponseEntity<String>("Successs",HttpStatus.ACCEPTED);
+	    }
+	 @GetMapping(value = "/{productId}/image")
+	    public void serveUserImage(@PathVariable int productId, HttpServletResponse response) throws  java.io.IOException {
+	        Product product = productRepositary.findById(productId).get();
+	        InputStream resource = fileService.getResource(imagePath, product.getProductImage());
+	        response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+	        StreamUtils.copy(resource, response.getOutputStream());
+	    }
+
 }
