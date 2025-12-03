@@ -1,42 +1,29 @@
 import { createContext, useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const LoginContext = createContext();
 
 export function LoginProvider({ children }) {
-  const [loginStatus, setloginStatus] = useState(false);
-  const navigate =  useNavigate();
-  const handleLogin = async (data) => {
-    try {
-      const res = await fetch("http://localhost:8080/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+  const [user, setuser] = useState(localStorage.getItem("user"));
+  const [token, settoken] = useState(localStorage.getItem("token"));
 
-      if (!res.ok) {
-        const errorBody = await res.json();
-        throw new Error(errorBody.message || "Login failed");
-      }
-
-      // eslint-disable-next-line no-unused-vars
-      const result = await res.json();
-      setloginStatus(true);
-      toast.success("Login successful");
-      setTimeout(()=>{
-        navigate("/")
-      },2000)
-    } catch (err) {
-      toast.error(err.message);
-    }
+  const loginUser = (token, user) => {
+    settoken(token);
+    setuser(user);
+    console.log("login details " + token, user);
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", user);
+    toast.success("LogIn Succesfully")
   };
 
-  return (
-    <LoginContext.Provider value={{ handleLogin, loginStatus, setloginStatus }}>
-      {children}
-    </LoginContext.Provider>
-  );
+  const logOutUser = () => {
+    settoken(null);
+    setuser(null);
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    toast.success("LogOut Succesfully")
+  };
+  return <LoginContext.Provider value={{user,token,logOutUser,loginUser}}>{children}</LoginContext.Provider>;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components

@@ -1,9 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -12,11 +10,11 @@ import {
   FieldDescription,
   FieldGroup,
   FieldLabel,
-  FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import {  useLogin } from "./Context/LoginContext";
+import { useNavigate } from "react-router-dom";
 
 export function LoginForm({ className, ...props }) {
   const {
@@ -24,9 +22,28 @@ export function LoginForm({ className, ...props }) {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const {handleLogin} =  useLogin();
+  const {user,token,logOutUser,loginUser} =  useLogin();
+  const navigate = useNavigate();
   const onSubmit = (data) => {
-    handleLogin(data);
+    console.log(data);
+    fetch("http://localhost:8080/auth/login",{
+      method:"POST",
+      headers : {
+        "Content-Type":"application/json"
+      },
+      body : JSON.stringify(data)
+    })
+    .then((res) => res.json())
+    .then((data)=>{
+      console.log(data);
+      loginUser(data.token,data.userDto)
+      navigate("/menu")
+
+    })
+    .catch((err)=>{
+      console.log(err)
+    })
+
   };
   return (
     <div
