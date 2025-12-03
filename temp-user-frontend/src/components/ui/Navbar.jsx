@@ -75,7 +75,7 @@ export const Navbar04 = React.forwardRef(
       const checkWidth = () => {
         if (containerRef.current) {
           const width = containerRef.current.offsetWidth;
-          setIsMobile(width < 768); // 768px is md breakpoint
+          setIsMobile(width < 768); 
         }
       };
 
