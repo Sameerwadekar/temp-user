@@ -66,12 +66,12 @@ export default function Menu() {
               {currentMeals.map((meal) => (
                 <Card key={meal.idMeal} className="overflow-hidden ">
                   <img
-                    src="https://cdn.pixabay.com/photo/2016/08/18/00/37/ice-1601932_960_720.jpg"
+                    src={`http://localhost:8080/products/${meal.id}/image`}
                     alt={meal.strMeal}
                     className="w-full h-40 object-cover  mt-0"
                   />
                   <CardContent className="">
-                    <div className="flex justify-between  items-center">
+                    <div className="flex justify-between  items-center"> 
                       <h3 className="font-semibold text-sm mb-2 line-clamp-1">
                         {meal.name}
                       </h3>
