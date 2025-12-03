@@ -80,3 +80,7 @@ for temporary make api permit all
 
 step 6 :
 test in postman
+
+step 7 :
+read api in frontend does it getting product image if yes 
+<img src={`http://localhost:8080/products/${meal.id}/image`}/>
