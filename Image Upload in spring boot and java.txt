@@ -1,0 +1,81 @@
+Image Upload 
+step 1 :
+Crate Interface FileService
+String uploadFile(MultipartFile file, String path) throws IOException;
+	  InputStream getResource(String path,String name) throws FileNotFoundException;
+
+step 2:
+Create FileServiceImpl implement file service over ride methods 
+public class FileServiceImpl implements FileService {
+
+	@Override
+	public String uploadFile(MultipartFile file, String path) throws IOException {
+		String originalFilename = file.getOriginalFilename();
+	     
+	       String filename = UUID.randomUUID().toString();
+	       String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+	       String fileNameWithExtension = filename + extension;
+	       String fullPathWithFileName = path  + fileNameWithExtension;
+	     
+	       if (extension.equalsIgnoreCase(".png") || extension.equalsIgnoreCase(".jpg") || extension.equalsIgnoreCase(".jpeg")) {
+	           //file save
+	      
+	           File folder = new File(path);
+	           if (!folder.exists()) {
+	               //create the folder
+	               folder.mkdirs();
+	           }
+	           //upload
+	           Files.copy(file.getInputStream(), Paths.get(fullPathWithFileName));
+	           return fileNameWithExtension;
+	       } else {
+	           throw new RuntimeException("File with this " + extension + " not allowed !!");    	
+	}
+	}
+
+	@Override
+	public InputStream getResource(String path, String name) throws FileNotFoundException {
+		String fullPath = path + File.separator + name;
+        InputStream inputStream = new FileInputStream(fullPath);
+        return inputStream;
+	}
+
+}
+
+step 3:
+application properties
+spring.servlet.multipart.max-file-size = 100MB
+spring.servlet.multipart.max-request-size=100MB
+product.image.path = images/products/
+
+
+step 4:
+bean of fileSerive Impl in productController
+ @PostMapping("products/{productId}/image")
+    public ResponseEntity<String> uploadUserImage(@RequestParam("productImage") MultipartFile image, @PathVariable int productId) throws IOException, java.io.IOException {
+        String imageName = fileService.uploadFile(image, imagePath);
+         Product product = productRepository.findById(productId).get();
+         System.out.println("ImageName"+imageName);
+         product.setProductImage(imageName);
+         productRepository.save(product);
+        return new ResponseEntity<String>("Successs",HttpStatus.ACCEPTED);
+    }
+
+    
+    		
+    		
+    
+    @GetMapping(value = "products/{productId}/image")
+    public void serveUserImage(@PathVariable int productId, HttpServletResponse response) throws  java.io.IOException {
+        Product product = productRepository.findById(productId).get();
+        InputStream resource = fileService.getResource(imagePath, product.getProductImage());
+        response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+        StreamUtils.copy(resource, response.getOutputStream());
+    }
+
+
+step 5 :
+for temporary make api permit all
+
+step 6 :
+test in postman

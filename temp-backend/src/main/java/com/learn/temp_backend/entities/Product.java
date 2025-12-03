@@ -29,4 +29,5 @@ public class Product {
 	private boolean available;
 	@ManyToOne
 	private Category category;
+	private String productImage;
 }
