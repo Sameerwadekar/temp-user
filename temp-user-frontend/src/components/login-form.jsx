@@ -1,10 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
@@ -13,8 +9,9 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
-import {  useLogin } from "./Context/LoginContext";
+import { useLogin } from "./Context/LoginContext";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export function LoginForm({ className, ...props }) {
   const {
@@ -22,37 +19,29 @@ export function LoginForm({ className, ...props }) {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const {user,token,logOutUser,loginUser} =  useLogin();
+  const { user, token, logOutUser, loginUser } = useLogin();
   const navigate = useNavigate();
   const onSubmit = (data) => {
-    console.log(data);
-    fetch("http://localhost:8080/auth/login",{
-      method:"POST",
-      headers : {
-        "Content-Type":"application/json"
-      },
-      body : JSON.stringify(data)
+    fetch("http://localhost:8080/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
     })
-    .then((res) => res.json())
-    .then((data)=>{
-      console.log(data);
-      loginUser(data.token,data.userDto)
-      navigate("/menu")
+      .then(async (res) => {
+        const result = await res.json();
 
-    })
-    .catch((err)=>{
-      console.log(err)
-    })
+        if (!res.ok) {
+          toast.error(result.message || "Invalid credentials");
+          return;
+        }
 
+        loginUser(result.token, result.userDto);
+        navigate("/menu");
+      })
+      .catch((err) => console.log(err));
   };
   return (
-    <div
-      className={cn(
-        "flex flex-col gap-6 mt-5",
-        className
-      )}
-      {...props}
-    >
+    <div className={cn("flex flex-col gap-6 mt-5", className)} {...props}>
       <div className="overflow-hidden p-0 flex flex-col justify-center items-center w-full">
         <CardHeader className="flex flex-col items-center gap-2 text-center">
           <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
@@ -120,7 +109,7 @@ export function LoginForm({ className, ...props }) {
                     required: "Password is required",
                   })}
                 />
-                 {errors.password && (
+                {errors.password && (
                   <span className="text-red-500 text-sm">
                     {errors.password.message}
                   </span>

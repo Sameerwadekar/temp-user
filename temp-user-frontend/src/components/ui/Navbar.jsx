@@ -19,15 +19,11 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { DropdownMenuDialog } from "./DropDown";
-import { Link, Links, useNavigate } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { CartContext } from "../Context/CartContext";
 
 // Simple logo component for the navbar
 const Logo = () => {
@@ -42,8 +38,8 @@ const Logo = () => {
 
 // Default navigation links
 const defaultNavigationLinks = [
-  { href: "#", label: "Home",path:"/" },
-  { href: "#", label: "Menu",path:"/menu" },
+  { href: "#", label: "Home", path: "/" },
+  { href: "#", label: "Menu", path: "/menu" },
   { href: "#", label: "Special Offers" },
 ];
 
@@ -75,7 +71,7 @@ export const Navbar04 = React.forwardRef(
       const checkWidth = () => {
         if (containerRef.current) {
           const width = containerRef.current.offsetWidth;
-          setIsMobile(width < 768); 
+          setIsMobile(width < 768);
         }
       };
 
@@ -114,6 +110,7 @@ export const Navbar04 = React.forwardRef(
     };
 
     const navigate = useNavigate();
+    const { cart } = useContext(CartContext);
 
     return (
       <>
@@ -146,9 +143,7 @@ export const Navbar04 = React.forwardRef(
                   <NavigationMenuList className="gap-1">
                     {navigationLinks.map((link, index) => (
                       <NavigationMenuItem key={index}>
-                        <NavigationMenuLink
-                          className="text-muted-foreground hover:text-primary py-1.5 font-medium transition-colors cursor-pointer group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
-                        >
+                        <NavigationMenuLink className="text-muted-foreground hover:text-primary py-1.5 font-medium transition-colors cursor-pointer group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50">
                           <Link to={link.path}>{link.label}</Link>
                         </NavigationMenuLink>
                       </NavigationMenuItem>
@@ -185,8 +180,14 @@ export const Navbar04 = React.forwardRef(
                   }}
                 >
                   <ShoppingCart />
+
+                  <span>Cart ({cart?.items?.length || 0})</span>
                 </Button>
-                <Button size="sm" asChild  className="text-sm font-medium px-4 h-9 rounded-md shadow-sm ">
+                <Button
+                  size="sm"
+                  asChild
+                  className="text-sm font-medium px-4 h-9 rounded-md shadow-sm "
+                >
                   <DropdownMenuDialog />
                 </Button>
               </div>
@@ -209,15 +210,10 @@ export const Navbar04 = React.forwardRef(
                     onClick={() => console.log(item.label)}
                     className="flex flex-col items-center text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
-                    <span
-                      className="text-lg cursor-pointer"
-                    >
+                    <span className="text-lg cursor-pointer">
                       <Link to={item.link}>{item.icon}</Link>
                     </span>
-                    <span
-                      className="text-[11px] cursor-pointer"
-                      
-                    >
+                    <span className="text-[11px] cursor-pointer">
                       <Link to={item.link}>{item.label}</Link>
                     </span>
                   </button>
