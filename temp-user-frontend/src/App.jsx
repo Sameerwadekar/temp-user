@@ -7,6 +7,7 @@ import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import Menu from "./components/Menu";
 import { ToastContainer } from "react-toastify";
 import { LoginProvider } from "./components/Context/LoginContext";
+import CartPage from "./components/CartPage";
 
 function Layout() {
   return (
@@ -50,6 +51,10 @@ function App() {
           path: "/menu",
           element: <Menu />,
         },
+        {
+          path:"/cart",
+          element:<CartPage/>
+        }
       ],
     },
     {
