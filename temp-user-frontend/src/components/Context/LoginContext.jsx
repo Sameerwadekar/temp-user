@@ -4,16 +4,22 @@ import { toast } from "react-toastify";
 const LoginContext = createContext();
 
 export function LoginProvider({ children }) {
-  const [user, setuser] = useState(localStorage.getItem("user"));
-  const [token, settoken] = useState(localStorage.getItem("token"));
+  const [user, setuser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user")) || null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [token, settoken] = useState(localStorage.getItem("token") || null);
 
   const loginUser = (token, user) => {
     settoken(token);
     setuser(user);
-    console.log("login details " + token, user);
     localStorage.setItem("token", token);
-    localStorage.setItem("user", user);
-    toast.success("LogIn Succesfully")
+    localStorage.setItem("user", JSON.stringify(user)); // ✔ correct
+    toast.success("Login Successful");
   };
 
   const logOutUser = () => {
@@ -21,10 +27,14 @@ export function LoginProvider({ children }) {
     setuser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    toast.success("LogOut Succesfully")
+    toast.success("LogOut Successfully");
   };
-  return <LoginContext.Provider value={{user,token,logOutUser,loginUser}}>{children}</LoginContext.Provider>;
+
+  return (
+    <LoginContext.Provider value={{ user, token, loginUser, logOutUser }}>
+      {children}
+    </LoginContext.Provider>
+  );
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useLogin = () => useContext(LoginContext);

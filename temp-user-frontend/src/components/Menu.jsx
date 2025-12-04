@@ -5,6 +5,8 @@ import FilterSheet from "./ui/FilterSheet";
 import { useMenu } from "./Context/MenuContext";
 import Loader from "@/components/ui/Loader";
 import DialogStickyFooterDemo from "./MealDialog";
+import { useContext } from "react";
+import { CartContext } from "./Context/CartContext";
 
 export default function Menu() {
   const {
@@ -17,6 +19,8 @@ export default function Menu() {
     totalPages,
     fetchProductsByCategory,
   } = useMenu();
+
+  const {addToCart} = useContext(CartContext)
 
   return (
     <div className="flex">
@@ -85,7 +89,7 @@ export default function Menu() {
                     <h3 className="font-semibold text-sm mb-2 line-clamp-1">
                       Rs.{meal.price}
                     </h3>
-                    <Button className="w-full bg-red-500 hover:bg-red-600 text-white">
+                    <Button className="w-full bg-red-500 hover:bg-red-600 text-white" onClick={()=>{addToCart(meal.id)}}>
                       Add To Cart
                     </Button>
                   </CardContent>
