@@ -5,6 +5,7 @@ export const CartContext = createContext();
 
 export function CartProvider({children}){
     const [cart, setCart] = useState(null)
+    
     const addToCart = async (productId) => {
         const user = JSON.parse(localStorage.getItem("user"));
         if(!user){
@@ -14,6 +15,7 @@ export function CartProvider({children}){
         const payload = {
             userId : user.id,
             productId : productId,
+
             quantity : 1
         }
         await fetch("http://localhost:8080/cart/add",{
@@ -34,6 +36,7 @@ export function CartProvider({children}){
         .then((data)=>console.log(data))
         .catch((err)=>console.log(err))
     }
+
     return (
         <CartContext.Provider value={{addToCart,cart}}>
             {children}

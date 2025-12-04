@@ -178,8 +178,9 @@ export const Navbar04 = React.forwardRef(
                     e.preventDefault();
                     if (onCartClick) onCartClick();
                   }}
+                  onClick={()=>{navigate("/cart")}}
                 >
-                  <ShoppingCart />
+                  <ShoppingCart/>
 
                   <span>Cart ({cart?.items?.length || 0})</span>
                 </Button>
