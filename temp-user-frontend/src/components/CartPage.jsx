@@ -1,11 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useContext } from "react";
 import { CartContext } from "./Context/CartContext";
 import { IndianRupee } from "lucide-react";
 
 function CartPage() {
-  const { cart } = useContext(CartContext);
-  console.log("cart", cart);
+  const { cart, getCart, removeFromCart, updateCartQuantity } =
+    useContext(CartContext);
+  useEffect(() => {
+    getCart();
+  }, []);
+
+  const handleRemoveFromCart = (productId) => {
+    removeFromCart(productId);
+  };
+
+  const handleUpdateQuantity = (productId, quantity) => {
+    updateCartQuantity(productId, quantity);
+  };
+
   return (
     <>
       <section className="py-24 relative">
@@ -23,7 +35,7 @@ function CartPage() {
                       >
                         <div className="img-box">
                           <img
-                            src="https://pagedone.io/asset/uploads/1701167635.png"
+                            src={`http://localhost:8080/products/${cartItem.productId}/image`}
                             alt="Product"
                             className="w-full md:max-w-[122px] rounded-lg object-cover"
                           />
@@ -40,6 +52,13 @@ function CartPage() {
                               <button
                                 type="button"
                                 className="flex items-center justify-center w-10 h-10 bg-gray-200 hover:bg-gray-300 border-r border-gray-300 text-gray-700"
+                                onClick={() =>
+                                  handleUpdateQuantity(
+                                    cartItem.productId,
+                                    cartItem.quantity - 1
+                                  )
+                                }
+                                disabled={cartItem.quantity === 1}
                               >
                                 −
                               </button>
@@ -48,12 +67,18 @@ function CartPage() {
                                 type="text"
                                 className="h-10 w-full text-center bg-gray-50 outline-none"
                                 readOnly
-                                value="1"
+                                value={cartItem.quantity}
                               />
 
                               <button
                                 type="button"
                                 className="flex items-center justify-center w-10 h-10 bg-gray-200 hover:bg-gray-300 border-l border-gray-300 text-gray-700"
+                                onClick={() =>
+                                  handleUpdateQuantity(
+                                    cartItem.productId,
+                                    cartItem.quantity + 1
+                                  )
+                                }
                               >
                                 +
                               </button>
@@ -61,31 +86,45 @@ function CartPage() {
                           </div>
 
                           <div className="flex items-center  gap-8">
-                            <h6 className="font-medium text-xl leading-8 text-indigo-600">
-                              Each
-                              <span>
-                                <IndianRupee className="inline-block" />
-                                {cartItem.price}
-                              </span>
-                            </h6>
-                            <h6 className="font-medium text-xl leading-8 text-indigo-600">
-                              Total
-                              <span>
-                                <IndianRupee className="inline-block" />
-                                {cartItem.totalPrice}
-                              </span>
-                            </h6>
+                            <div className="price-container">
+                              <h6 className="font-medium text-xl leading-8 text-indigo-600">
+                                Each
+                                <span>
+                                  <IndianRupee className="inline-block" />
+                                  <span className="price">
+                                    {cartItem.price}
+                                  </span>
+                                </span>
+                              </h6>
+                              <h6 className="font-medium text-xl leading-8 text-indigo-600">
+                                Total
+                                <span>
+                                  <IndianRupee className="inline-block" />
+                                  <span className="price">
+                                    {cartItem.totalPrice}
+                                  </span>
+                                </span>
+                              </h6>
+                            </div>
                           </div>
                         </div>
+
+                        <button
+                          type="button"
+                          className="text-red-500 text-sm font-medium hover:text-red-700 transition-all duration-300"
+                          onClick={() =>
+                            handleRemoveFromCart(cartItem.productId)
+                          }
+                        >
+                          Remove
+                        </button>
                       </div>
                     ))}
                   </>
                 ) : (
-                  <>
-                    <div className="text-center py-4 font-medium text-gray-500">
-                      Cart is Empty
-                    </div>
-                  </>
+                  <div className="text-center py-4 font-medium text-gray-500">
+                    Cart is Empty
+                  </div>
                 )}
               </div>
             </div>
@@ -107,11 +146,6 @@ function CartPage() {
                     <p className="text-lg text-gray-400">Shipping</p>
                     <p className="text-lg text-emerald-500">#FREE</p>
                   </div>
-
-                  {/* <div className="flex items-center justify-between">
-                    <p className="text-lg text-gray-400">Coupon Code</p>
-                    <p className="text-lg text-emerald-500">#APPLIED</p>
-                  </div> */}
                 </div>
 
                 <div className="flex items-center justify-between pt-6">
