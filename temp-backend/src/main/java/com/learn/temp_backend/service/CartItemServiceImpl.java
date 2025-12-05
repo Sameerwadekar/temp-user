@@ -109,6 +109,7 @@ public class CartItemServiceImpl implements CartItemService {
 	                item.getProduct().getName(),
 	                item.getProduct().getPrice(),
 	                item.getQuantity(),
+	                item.getProduct().getProductImage(),
 	                itemTotal
 	        );
 	    }).collect(Collectors.toList());
