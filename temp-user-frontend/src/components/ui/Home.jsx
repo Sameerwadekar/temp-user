@@ -4,6 +4,7 @@ import { Button } from "./button";
 import { ArrowRight } from "lucide-react";
 import Menu from "../Menu";
 import { useNavigate } from "react-router-dom";
+import Review from "../Review";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -41,6 +42,7 @@ const Home = () => {
           </div>
         </div>
       </section>
+      <Review/>
     </>
   );
 };

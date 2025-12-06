@@ -8,6 +8,7 @@ import Menu from "./components/Menu";
 import { ToastContainer } from "react-toastify";
 import { LoginProvider } from "./components/Context/LoginContext";
 import CartPage from "./components/CartPage";
+import OrderSummary from "./components/OrderSummary";
 
 function Layout() {
   return (
@@ -54,6 +55,10 @@ function App() {
         {
           path:"/cart",
           element:<CartPage/>
+        },
+        {
+          path:"/carteg",
+          element:<OrderSummary/>
         }
       ],
     },

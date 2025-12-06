@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CartItemDto {
+	private Long cartItemId;
 	 	private int productId;
 	    private String productName;
 	    private BigDecimal price;

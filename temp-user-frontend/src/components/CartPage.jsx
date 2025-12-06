@@ -8,14 +8,17 @@ function CartPage() {
     useContext(CartContext);
   useEffect(() => {
     getCart();
+   
   }, []);
+
+   console.log("cartPage",cart);
 
   const handleRemoveFromCart = (productId) => {
     removeFromCart(productId);
   };
 
-  const handleUpdateQuantity = (productId, quantity) => {
-    updateCartQuantity(productId, quantity);
+  const handleUpdateQuantity = (cartItemId, quantity) => {
+    updateCartQuantity(cartItemId, quantity);
   };
 
   return (
@@ -48,13 +51,13 @@ function CartPage() {
                             </h2>
 
                             {/* Quantity Counter */}
-                            <div className="flex items-center max-w-[9rem] rounded-lg overflow-hidden border border-gray-300 bg-gray-100">
+                            <div className="flex items-center max-w-36 rounded-lg overflow-hidden border border-gray-300 bg-gray-100">
                               <button
                                 type="button"
                                 className="flex items-center justify-center w-10 h-10 bg-gray-200 hover:bg-gray-300 border-r border-gray-300 text-gray-700"
                                 onClick={() =>
                                   handleUpdateQuantity(
-                                    cartItem.productId,
+                                    cartItem.cartItemId,
                                     cartItem.quantity - 1
                                   )
                                 }
@@ -75,7 +78,7 @@ function CartPage() {
                                 className="flex items-center justify-center w-10 h-10 bg-gray-200 hover:bg-gray-300 border-l border-gray-300 text-gray-700"
                                 onClick={() =>
                                   handleUpdateQuantity(
-                                    cartItem.productId,
+                                    cartItem.cartItemId,
                                     cartItem.quantity + 1
                                   )
                                 }
