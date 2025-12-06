@@ -1,150 +1,125 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-
-const orderItems = [
-  {
-    id: 1,
-    name: "Vokline Women sports shoes, Running shoes",
-    size: "6",
-    price: 100,
-    image: "https://via.placeholder.com/70", // add image URL to avoid undefined
-    quantity: 1,
-  },
-  {
-    id: 2,
-    name: "Men Printed Round Neck Cotton Purple T-Shirt",
-    size: "M",
-    price: 79,
-    image: "https://via.placeholder.com/70",
-    quantity: 1,
-  },
-  {
-    id: 3,
-    name: "Men Solid Hooded Neck Purple Sweater",
-    size: "M",
-    price: 89,
-    image: "https://via.placeholder.com/70",
-    quantity: 1,
-  },
-];
+import { IndianRupee, Trash2 } from "lucide-react";
+import React, { useContext, useEffect } from "react";
+import { CartContext } from "./Context/CartContext";
 
 export default function OrderSummary() {
+  const { cart, getCart, removeFromCart, updateCartQuantity } =
+    useContext(CartContext);
+
+  useEffect(() => {
+    getCart();
+  }, []);
+
   return (
     <div className="w-full flex justify-center py-10 bg-muted/40">
       <Card className="w-full max-w-5xl p-6 shadow-lg">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
-          {/* LEFT SIDE – ORDER SUMMARY */}
-          <div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* ▶ LEFT SIDE — CART ITEMS */}
+          <div className="h-[500px] overflow-auto border-amber-500 lg:col-span-2">
             <CardHeader>
-              <CardTitle className="text-xl">Order Summaries</CardTitle>
+              <CardTitle className="text-xl">Order Summary</CardTitle>
             </CardHeader>
 
             <CardContent className="space-y-6">
-              
-              {/* Header info */}
-              <div className="grid grid-cols-3 gap-4 text-sm">
-                <div>
-                  <p className="text-muted-foreground">Delivery Date</p>
-                  <p className="font-medium">Dec 10, 2025</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Order ID</p>
-                  <p className="font-medium">#56489454284</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Payment Method</p>
-                  <div className="flex items-center gap-2">
-                    <div className="h-3 w-3 rounded-full bg-yellow-500"></div>
-                    <div className="h-3 w-3 rounded-full bg-red-600"></div>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* ITEMS */}
-              <div className="space-y-4">
-                {orderItems.map((item) => (
+              {cart?.items?.length > 0 ? (
+                cart.items.map((item) => (
                   <div
-                    key={item.id}
-                    className="flex items-center justify-between border rounded-lg p-4"
+                    key={item.cartItemId}
+                    className="flex items-center gap-4 border rounded-lg p-4"
                   >
-                    <div className="flex items-center gap-4">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        width={70}
-                        height={70}
-                        className="rounded-md object-cover"
-                      />
-                      <div>
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Size : {item.size}
-                        </p>
+                    {/* Product Image */}
+                    <img
+                      src={`http://localhost:8080/products/${item.productId}/image`}
+                      alt={item.productName}
+                      className="w-20 h-15 rounded-md object-cover"
+                    />
+
+                    {/* Name + Quantity */}
+                    <div className="flex-1 space-y-1">
+                      <p className="font-semibold text-gray-800">
+                        {item.productName}
+                      </p>
+
+                      <div className="flex items-center gap-2 rounded-md border px-2 py-1 w-fit">
+                        <button
+                          className="px-2 text-lg"
+                          disabled={item.quantity === 1}
+                          onClick={() =>
+                            updateCartQuantity(
+                              item.cartItemId,
+                              item.quantity - 1
+                            )
+                          }
+                        >
+                          –
+                        </button>
+                        <span className="w-6 text-center">{item.quantity}</span>
+                        <button
+                          className="px-2 text-lg"
+                          onClick={() =>
+                            updateCartQuantity(
+                              item.cartItemId,
+                              item.quantity + 1
+                            )
+                          }
+                        >
+                          +
+                        </button>
                       </div>
                     </div>
-                    <p className="font-medium">${item.price}.00</p>
+
+                    {/* Price + Delete */}
+                    <div className="text-right space-y-1">
+                      <button
+                        className="text-red-500 hover:text-red-700 mb-1"
+                        onClick={() => removeFromCart(item.productId)}
+                      >
+                        <Trash2 size={18} />
+                      </button>
+
+                      <p className="font-bold flex justify-end items-center gap-1">
+                        <IndianRupee size={15} className="text-red-600"/> <span className="text-red-600">{item.totalPrice}</span>
+                      </p>
+                      <p className="text-sm text-gray-600 flex justify-end items-center gap-1">
+                        <IndianRupee size={13} /> {item.price} each
+                      </p>
+                    </div>
                   </div>
-                ))}
-              </div>
+                ))
+              ) : (
+                <p className="text-center text-gray-500">Cart is Empty</p>
+              )}
             </CardContent>
           </div>
 
-          {/* RIGHT SIDE – BILLING */}
-          <div className="border rounded-lg p-6 bg-white shadow-sm">
-            <h2 className="text-lg font-semibold">Billing Address</h2>
-
-            <div className="mt-4 space-y-3 text-sm">
-              <div>
-                <p className="text-muted-foreground">Name</p>
-                <p className="font-medium">Cristofer Schleifer</p>
+          {/* ▶ RIGHT SIDE — BILLING & PRICE SUMMARY */}
+          {cart?.items?.length > 0 && (
+            <div className="border rounded-lg p-6 bg-white shadow-sm lg:col-span-1">
+              <h2 className="text-lg font-semibold">Order Summary</h2>
+              <Separator className="my-6" />
+              {/* PRICE SUMMARY */}
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between">
+                  <p className="text-muted-foreground">Subtotal</p>
+                  <p className="font-medium">₹{cart.cartTotal}</p>
+                </div>
+                <div className="flex justify-between">
+                  <p className="text-muted-foreground">Shipping</p>
+                  <p className="font-medium text-green-500">FREE</p>
+                </div>
+                <Separator />
+                <div className="flex justify-between text-base font-semibold">
+                  <p>Total</p>
+                  <p>₹{cart.cartTotal}</p>
+                </div>
               </div>
 
-              <div>
-                <p className="text-muted-foreground">Email Address</p>
-                <p className="font-medium">cristofer@example.com</p>
-              </div>
-
-              <div>
-                <p className="text-muted-foreground">Phone Number</p>
-                <p className="font-medium">+1 (212) 4 178 368</p>
-              </div>
-
-              <div>
-                <p className="text-muted-foreground">Address</p>
-                <p className="font-medium">
-                  Street 91, Empire State, 350 Fifth Avenue, New York
-                </p>
-              </div>
+              <Button className="w-full mt-6">Proceed To Checkout</Button>
             </div>
-
-            <Separator className="my-6" />
-
-            {/* PRICE SUMMARY */}
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <p className="text-muted-foreground">Subtotal</p>
-                <p className="font-medium">$268.00</p>
-              </div>
-
-              <div className="flex justify-between">
-                <p className="text-muted-foreground">Discount</p>
-                <p className="font-medium text-red-500">- $50.00</p>
-              </div>
-
-              <Separator />
-
-              <div className="flex justify-between text-base font-semibold">
-                <p>Total</p>
-                <p>$218.00</p>
-              </div>
-            </div>
-
-            <Button className="w-full mt-6">Continue Shopping</Button>
-          </div>
+          )}
         </div>
       </Card>
     </div>
