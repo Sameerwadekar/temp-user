@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import  { createContext,useState } from "react";
 import { toast } from "react-toastify";
 
@@ -5,6 +6,7 @@ export const CartContext = createContext();
 
 export function CartProvider({children}){
     const [cart, setCart] = useState(null)
+    const user = JSON.parse(localStorage.getItem("user"));
 
     const getCart = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -49,8 +51,22 @@ export function CartProvider({children}){
         .catch((err)=>console.log(err))
     }
 
+    const updateCartQuantity = async (cartItemId, newQuantity) => {
+  try {
+    const res = await fetch(
+      `http://localhost:8080/cart/update/${cartItemId}?quantity=${newQuantity}`,
+      { method: "PUT" }
+    );
+    const data = await res.json();
+    setCart(data);
+  } catch (e) {
+    console.error("Update failed", e);
+  }
+};
+
+
     return (
-        <CartContext.Provider value={{addToCart,cart,getCart}}>
+        <CartContext.Provider value={{addToCart,cart,getCart,updateCartQuantity}}>
             {children}
         </CartContext.Provider>
     )

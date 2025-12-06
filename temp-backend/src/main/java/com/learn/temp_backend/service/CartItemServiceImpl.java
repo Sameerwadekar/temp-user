@@ -97,6 +97,35 @@ public class CartItemServiceImpl implements CartItemService {
 	        cart.getItems().remove(item); 
 	        return cartDto(cart);
 	}
+//	@SuppressWarnings("deprecation")
+//	private CartDto cartDto(Cart cart) {
+//
+//	    var itemsDto = cart.getItems().stream().map(item -> {
+//	        BigDecimal itemTotal = item.getProduct().getPrice()
+//	                .multiply(BigDecimal.valueOf(item.getQuantity()));
+//
+//	        return new CartItemDto(
+//	        		dto.setCartItemId(cartItem.getId());
+//	                item.getProduct().getId(),
+//	                item.getProduct().getName(),
+//	                item.getProduct().getPrice(),
+//	                item.getQuantity(),
+//	                item.getProduct().getProductImage(),
+//	                itemTotal
+//	        );
+//	    }).collect(Collectors.toList());
+//
+//	    BigDecimal total = itemsDto.stream()
+//	            .map(CartItemDto::getTotalPrice)
+//	            .reduce(BigDecimal.ZERO, BigDecimal::add);
+//
+//	    CartDto dto = new CartDto();
+//	    dto.setCartId(cart.getId());
+//	    dto.setUserId(cart.getUser().getId());
+//	    dto.setItems(itemsDto);
+//	    dto.setCartTotal(total);
+//	    return dto;
+//	}
 	@SuppressWarnings("deprecation")
 	private CartDto cartDto(Cart cart) {
 
@@ -104,14 +133,16 @@ public class CartItemServiceImpl implements CartItemService {
 	        BigDecimal itemTotal = item.getProduct().getPrice()
 	                .multiply(BigDecimal.valueOf(item.getQuantity()));
 
-	        return new CartItemDto(
-	                item.getProduct().getId(),
-	                item.getProduct().getName(),
-	                item.getProduct().getPrice(),
-	                item.getQuantity(),
-	                item.getProduct().getProductImage(),
-	                itemTotal
-	        );
+	        CartItemDto dto = new CartItemDto();
+	        dto.setCartItemId(item.getId());                       // 🔥 cartItemId added here
+	        dto.setProductId(item.getProduct().getId());
+	        dto.setProductName(item.getProduct().getName());
+	        dto.setPrice(item.getProduct().getPrice());
+	        dto.setQuantity(item.getQuantity());
+	        dto.setProductImage(item.getProduct().getProductImage());
+	        dto.setTotalPrice(itemTotal);
+
+	        return dto;
 	    }).collect(Collectors.toList());
 
 	    BigDecimal total = itemsDto.stream()
@@ -123,7 +154,9 @@ public class CartItemServiceImpl implements CartItemService {
 	    dto.setUserId(cart.getUser().getId());
 	    dto.setItems(itemsDto);
 	    dto.setCartTotal(total);
+
 	    return dto;
 	}
+
 
 }
