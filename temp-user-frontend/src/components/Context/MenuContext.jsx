@@ -34,12 +34,33 @@ export function MenuProvider({ children }) {
       .catch((err) => console.error(err));
   }, []);
 
-  const fetchProductsByCategory = (link) =>{
-    fetch(link)
-    .then(res=>res.json())
-    .then(data => setMeals(data["_embedded"]["products"]))
-    .catch(err => console.log(err))
-  }
+  const fetchProductsByCategory = (link) => {
+  setLoading(true);
+  fetch(link)
+    .then(res => res.json())
+    .then(data => {
+      const products = data["_embedded"]["products"].map(item => {
+        // extract ID from _links.self.href
+        const href = item._links?.self?.href;
+        const id = href ? href.split("/").pop() : null;
+
+        return {
+          ...item,
+          id: Number(id), // assign id for frontend use
+        };
+      });
+
+      setMeals(products);
+      setCurrentPage(1);
+      setSelectedCat(products.length ? products[0].category : ""); // optional
+      setLoading(false);
+    })
+    .catch(err => {
+      console.log(err);
+      setLoading(false);
+    });
+};
+
 
   // Pagination logic
   const indexOfLast = currentPage * itemsPerPage;

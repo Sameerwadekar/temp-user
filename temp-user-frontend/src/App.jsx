@@ -9,6 +9,8 @@ import { ToastContainer } from "react-toastify";
 import { LoginProvider } from "./components/Context/LoginContext";
 import CartPage from "./components/CartPage";
 import OrderSummary from "./components/OrderSummary";
+import { CartContext } from "./components/Context/CartContext";
+import { useContext, useEffect } from "react";
 
 function Layout() {
   return (
@@ -28,6 +30,11 @@ function Layout() {
 }
 
 function App() {
+  const {  getCart } =
+        useContext(CartContext);
+      useEffect(() => {
+        getCart();
+      }, []);
   const router = createBrowserRouter([
     {
       element: (

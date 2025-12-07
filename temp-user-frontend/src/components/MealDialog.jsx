@@ -33,7 +33,7 @@ const DialogStickyFooterDemo = ({ imgLink, title, description,price}) => {
                       <strong>Item Img:</strong>
                     </p>
                     <img
-                      src="https://media.istockphoto.com/id/1456234806/photo/mango-ice-cream-served-in-cup-isolated-on-grey-background-top-view-of-indian-and-bangladesh.jpg?s=2048x2048&w=is&k=20&c=roTFn2xy4mwGPoV-rOJ8l3ZCh2xfNnn6aaUVY-crPY4="
+                      src={`http://localhost:8080/products/${imgLink}/image`}
                       alt="Content image"
                       className="w-full rounded"
                     />
