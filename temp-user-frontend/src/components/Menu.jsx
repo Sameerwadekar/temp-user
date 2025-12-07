@@ -20,7 +20,7 @@ export default function Menu() {
     fetchProductsByCategory,
   } = useMenu();
 
-  const {addToCart} = useContext(CartContext)
+  const { addToCart } = useContext(CartContext);
 
   return (
     <div className="flex">
@@ -70,26 +70,34 @@ export default function Menu() {
               {currentMeals.map((meal) => (
                 <Card key={meal.idMeal} className="overflow-hidden ">
                   <img
-                    src={`http://localhost:8080/products/${meal.id}/image`}
-                    alt={meal.strMeal}
-                    className="w-full h-40 object-cover  mt-0"
+                    src={
+                      meal.productImage
+                        ? `http://localhost:8080/products/${meal.id}/image`
+                        : "https://via.placeholder.com/150" // fallback if no image
+                    }
+                    alt={meal.name}
+                    className="w-full h-40 object-cover"
                   />
+
                   <CardContent className="">
-                    <div className="flex justify-between  items-center"> 
+                    <div className="flex justify-between  items-center">
                       <h3 className="font-semibold text-sm mb-2 line-clamp-1">
                         {meal.name}
                       </h3>
                       <DialogStickyFooterDemo
-                        imgLink={meal.strMealThumb}
+                        imgLink={meal.id}
                         title={meal.name}
-                        description = {meal.description}
-                        price = {meal.price}
+                        description={meal.description}
+                        price={meal.price}
                       />
                     </div>
                     <h3 className="font-semibold text-sm mb-2 line-clamp-1">
                       Rs.{meal.price}
                     </h3>
-                    <Button className="w-full bg-red-500 hover:bg-red-600 text-white" onClick={()=>{addToCart(meal.id)}}>
+                    <Button
+                      className="w-full bg-red-500 hover:bg-red-600 text-white"
+                      onClick={() => addToCart(meal.id)}
+                    >
                       Add To Cart
                     </Button>
                   </CardContent>

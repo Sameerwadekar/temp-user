@@ -47,16 +47,8 @@ export const Navbar04 = React.forwardRef(
   (
     {
       className,
-      logo = <Logo />,
-      logoHref = "#",
       navigationLinks = defaultNavigationLinks,
-      signInText = "Sign In",
-      signInHref = "#signin",
-      cartText = "Cart",
-      cartHref = "#cart",
-      cartCount = 2,
       searchPlaceholder = "Search...",
-      onSignInClick,
       onCartClick,
       onSearchSubmit,
       ...props
@@ -111,13 +103,14 @@ export const Navbar04 = React.forwardRef(
 
     const navigate = useNavigate();
     const { cart } = useContext(CartContext);
+    const itemCount = cart?.items?.length || 0;
 
     return (
       <>
         <header
           ref={combinedRef}
           className={cn(
-            "sticky top-0 z-50 w-full border-b bg-background/40 backdrop-blur supports-[backdrop-filter]:bg-background/30 px-4 md:px-6 [&_*]:no-underline",
+            "sticky top-0 z-50 w-full border-b bg-background/40 backdrop-blur supports-backdrop-filter:bg-background/30 px-4 md:px-6 [&_*]:no-underline",
             className
           )}
           {...props}
@@ -177,12 +170,32 @@ export const Navbar04 = React.forwardRef(
                   onClick={(e) => {
                     e.preventDefault();
                     if (onCartClick) onCartClick();
-                    {navigate("/cart")}
+                    {
+                      navigate("/cart");
+                    }
                   }}
                 >
-                  <ShoppingCart/>
+                  <div className="relative inline-block">
+                    <ShoppingCart />
+                    {itemCount > 0 && (
+                      <div
+                        className="
+                absolute  
+                bg-red-500 text-white 
+                rounded-full 
+                h-5 w-5 
+                flex items-center justify-center 
+                text-xs font-bold 
+                shadow-md
+            "
+                        style={{ top: "-18px", right: "-21px" }}
+                      >
+                        {itemCount}
+                      </div>
+                    )}
+                  </div>
 
-                  <span>Cart ({cart?.items?.length || 0})</span>
+                  {/* <span>Cart ({cart?.items?.length || 0})</span> */}
                 </Button>
                 <Button
                   size="sm"
@@ -203,7 +216,7 @@ export const Navbar04 = React.forwardRef(
                 { label: "Home", icon: <House />, link: "/" },
                 { label: "Offers", icon: <Gift />, link: "#" },
                 { label: "Menu", icon: <ShoppingBasket />, link: "/menu" },
-                { label: "Cart", icon: <ShoppingCart />, link: "#" },
+                { label: "Cart", icon: <ShoppingCart />, link: "/cart" },
                 { label: "Profile", icon: <CircleUserRound />, link: "/login" },
               ].map((item, i) => (
                 <li key={i}>

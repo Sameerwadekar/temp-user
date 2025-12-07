@@ -1,13 +1,18 @@
-import React from "react";
+import React,{useContext,useEffect} from "react";
 import staw from "../../assets/home-bowl.png";
 import { Button } from "./button";
 import { ArrowRight } from "lucide-react";
 import Menu from "../Menu";
 import { useNavigate } from "react-router-dom";
 import Review from "../Review";
+import { CartContext } from "../Context/CartContext";
 
 const Home = () => {
   const navigate = useNavigate();
+  const {getCart} = useContext(CartContext)
+   useEffect(() => {
+      getCart();
+    }, []);
   return (
     <>
       <section className="relative w-full h-auto md:h-[60vh] overflow-visible bg-[#71CA9A] py-10 md:py-0">
