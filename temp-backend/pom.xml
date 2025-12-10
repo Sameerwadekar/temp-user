@@ -141,5 +141,16 @@
 			</plugin>
 		</plugins>
 	</build>
+<profiles>
+    <profile>
+        <id>production</id>
+        <activation>
+            <activeByDefault>false</activeByDefault>
+        </activation>
+        <properties>
+            <skipTests>true</skipTests>
+        </properties>
+    </profile>
+</profiles>
 
 </project>
