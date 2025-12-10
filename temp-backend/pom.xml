@@ -8,9 +8,9 @@
 		<version>3.5.7</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<!-- <groupId>com.learn</groupId>
+	<groupId>com.learn</groupId>
 	<artifactId>temp-backend</artifactId>
-	<version>0.0.1-SNAPSHOT</version> -->
+	<version>0.0.1-SNAPSHOT</version>
 	<name>temp-backend</name>
 	<description>TempStation The Ice Cream Lounge</description>
 	<url/>
