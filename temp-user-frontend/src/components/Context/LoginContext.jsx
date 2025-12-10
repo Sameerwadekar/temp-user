@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const LoginContext = createContext();
@@ -13,6 +14,7 @@ export function LoginProvider({ children }) {
   });
 
   const [token, settoken] = useState(localStorage.getItem("token") || null);
+  const navigate = useNavigate();
 
   const loginUser = (token, user) => {
     settoken(token);
@@ -28,6 +30,7 @@ export function LoginProvider({ children }) {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     toast.success("LogOut Successfully");
+    setTimeout(() => navigate("/"), 1000);
   };
 
   return (
