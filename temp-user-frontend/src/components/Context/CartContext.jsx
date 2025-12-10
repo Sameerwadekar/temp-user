@@ -64,9 +64,17 @@ export function CartProvider({children}){
   }
 };
 
+const removeFromCart = async (cartItemId) => {
+  const res = await fetch(`http://localhost:8080/cart/remove/${cartItemId}`, {
+    method: "DELETE",
+  });
+
+  const updatedCart = await res.json();
+  setCart(updatedCart); // update cart in context
+};
 
     return (
-        <CartContext.Provider value={{addToCart,cart,getCart,updateCartQuantity}}>
+        <CartContext.Provider value={{addToCart,cart,getCart,updateCartQuantity,removeFromCart}}>
             {children}
         </CartContext.Provider>
     )

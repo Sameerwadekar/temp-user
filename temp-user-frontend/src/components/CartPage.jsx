@@ -76,7 +76,8 @@ function CartPage() {
                     <div className="text-right space-y-1">
                       <button
                         className="text-red-500 hover:text-red-700 mb-1 cursor-pointer"
-                        onClick={() => removeFromCart(item.productId)}
+                        onClick={() => removeFromCart(item.cartItemId)}
+
                       >
                         <Trash2 size={18} />
                       </button>
