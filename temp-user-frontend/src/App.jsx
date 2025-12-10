@@ -11,6 +11,7 @@ import CartPage from "./components/CartPage";
 import OrderSummary from "./components/OrderSummary";
 import { CartContext } from "./components/Context/CartContext";
 import { useContext, useEffect } from "react";
+import CheckOutPage from "./components/CheckOutPage";
 
 function Layout() {
   return (
@@ -64,8 +65,8 @@ function App() {
           element:<CartPage/>
         },
         {
-          path:"/carteg",
-          element:<OrderSummary/>
+          path:"/checkout",
+          element:<CheckOutPage/>
         }
       ],
     },

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { IndianRupee, Trash2 } from "lucide-react";
 import React, { useContext, useEffect } from "react";
 import { CartContext } from "./Context/CartContext";
+import { useNavigate } from "react-router-dom";
 
 function CartPage() {
   const { cart, getCart, removeFromCart, updateCartQuantity } =
@@ -11,6 +12,7 @@ function CartPage() {
     useEffect(() => {
       getCart();
     }, []);
+    const navigate = useNavigate()
   return (
     <>
       <div className="w-full flex justify-center py-10 bg-muted/40">
@@ -44,7 +46,7 @@ function CartPage() {
 
                       <div className="flex items-center gap-2 rounded-md border px-2 py-1 w-fit">
                         <button
-                          className="px-2 text-lg"
+                          className="px-2 text-lg cursor-pointer"
                           disabled={item.quantity === 1}
                           onClick={() =>
                             updateCartQuantity(
@@ -57,7 +59,7 @@ function CartPage() {
                         </button>
                         <span className="w-6 text-center">{item.quantity}</span>
                         <button
-                          className="px-2 text-lg"
+                          className="px-2 text-lg cursor-pointer"
                           onClick={() =>
                             updateCartQuantity(
                               item.cartItemId,
@@ -73,7 +75,7 @@ function CartPage() {
                     {/* Price + Delete */}
                     <div className="text-right space-y-1">
                       <button
-                        className="text-red-500 hover:text-red-700 mb-1"
+                        className="text-red-500 hover:text-red-700 mb-1 cursor-pointer"
                         onClick={() => removeFromCart(item.productId)}
                       >
                         <Trash2 size={18} />
@@ -116,7 +118,7 @@ function CartPage() {
                 </div>
               </div>
 
-              <Button className="w-full mt-6">Proceed To Checkout</Button>
+              <Button className="w-full mt-6 cursor-pointer" onClick={() => navigate("/checkout")}>Proceed To Checkout</Button>
             </div>
           )}
         </div>

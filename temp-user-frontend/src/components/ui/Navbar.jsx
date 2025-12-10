@@ -102,8 +102,12 @@ export const Navbar04 = React.forwardRef(
     };
 
     const navigate = useNavigate();
-    const { cart } = useContext(CartContext);
+    const { cart,getCart } = useContext(CartContext);
     const itemCount = cart?.items?.length || 0;
+
+        useEffect(() => {
+          getCart();
+        }, []);
 
     return (
       <>
