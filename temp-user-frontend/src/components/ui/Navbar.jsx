@@ -24,6 +24,8 @@ import { DropdownMenuDialog } from "./DropDown";
 import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { CartContext } from "../Context/CartContext";
+import { useLogin } from "../Context/LoginContext";
+import SidebarMenu from "./admin_navbar";
 
 // Simple logo component for the navbar
 const Logo = () => {
@@ -102,88 +104,127 @@ export const Navbar04 = React.forwardRef(
     };
 
     const navigate = useNavigate();
-    const { cart,getCart } = useContext(CartContext);
+    const { cart, getCart } = useContext(CartContext);
+    const { token, user } = useLogin();
     const itemCount = cart?.items?.length || 0;
 
-        useEffect(() => {
-          getCart();
-        }, []);
+    useEffect(() => {
+      getCart();
+    }, []);
 
     return (
       <>
-        <header
-          ref={combinedRef}
-          className={cn(
-            "sticky top-0 z-50 w-full border-b bg-background/40 backdrop-blur supports-backdrop-filter:bg-background/30 px-4 md:px-6 [&_*]:no-underline",
-            className
-          )}
-          {...props}
-        >
-          <div className="container mx-auto flex h-16 max-w-screen-2xl items-center justify-between gap-4">
-            {/* Left side */}
-            <div className="flex flex-1 items-center gap-2 ">
-              {/* Main nav */}
-              <div className="flex flex-1 items-center gap-6 max-md:justify-between">
-                <button className="flex items-center">
-                  <img
-                    src={LogoImg}
-                    style={{ height: "150px", weight: "300px" }}
-                    alt="Logo"
-                  />
-                </button>
-              </div>
-            </div>
-            {/* CENTER: Navigation + Search */}
-            <div className="flex flex-1 items-center  gap-6">
-              {!isMobile && (
-                <NavigationMenu className="flex">
-                  <NavigationMenuList className="gap-1">
-                    {navigationLinks.map((link, index) => (
-                      <NavigationMenuItem key={index}>
-                        <NavigationMenuLink className="text-muted-foreground hover:text-primary py-1.5 font-medium transition-colors cursor-pointer group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50">
-                          <Link to={link.path}>{link.label}</Link>
-                        </NavigationMenuLink>
-                      </NavigationMenuItem>
-                    ))}
-                  </NavigationMenuList>
-                </NavigationMenu>
-              )}
-
-              <form
-                onSubmit={handleSearchSubmit}
-                className="relative md:hidden"
-              >
-                <Input
-                  id={searchId}
-                  name="search"
-                  className="peer h-8 ps-8 pe-2"
-                  placeholder={searchPlaceholder}
-                  type="search"
-                />
-                <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-2 peer-disabled:opacity-50">
-                  <SearchIcon size={16} />
+        {token && user.roleName == "ROLE_ADMIN" ? (
+          <header
+            ref={combinedRef}
+            className={cn(
+              "sticky top-0 z-50 w-full border-b bg-background/40 backdrop-blur supports-backdrop-filter:bg-background/30 px-4 md:px-6 [&_*]:no-underline",
+              className
+            )}
+            {...props}
+          >
+            <div className="container mx-auto flex h-16 max-w-screen-2xl items-center justify-between gap-4">
+              {/* Left side */}
+              <div className="flex flex-1 items-center gap-2 ">
+                {/* Main nav */}
+                <div className="flex flex-1 items-center gap-6 max-md:justify-between">
+                  <button className="flex items-center">
+                    <img
+                      src={LogoImg}
+                      style={{ height: "150px", weight: "300px" }}
+                      alt="Logo"
+                    />
+                  </button>
                 </div>
-              </form>
+              </div>
+              {/* Right side */}
+              {!isMobile && (
+                <div className="flex items-center gap-3">
+                  <Button
+                    size="sm"
+                    asChild
+                    className="text-sm font-medium px-4 h-9 rounded-md shadow-sm "
+                  >
+                    <SidebarMenu />
+                  </Button>
+                </div>
+              )}
             </div>
-            {/* Right side */}
-            {!isMobile && (
-              <div className="flex items-center gap-3">
-                <Button
-                  size="sm"
-                  className="text-sm font-medium px-4 h-9 rounded-md shadow-sm cursor-pointer"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (onCartClick) onCartClick();
-                    {
-                      navigate("/cart");
-                    }
-                  }}
+          </header>
+        ) : (
+          <header
+            ref={combinedRef}
+            className={cn(
+              "sticky top-0 z-50 w-full border-b bg-background/40 backdrop-blur supports-backdrop-filter:bg-background/30 px-4 md:px-6 [&_*]:no-underline",
+              className
+            )}
+            {...props}
+          >
+            <div className="container mx-auto flex h-16 max-w-screen-2xl items-center justify-between gap-4">
+              {/* Left side */}
+              <div className="flex flex-1 items-center gap-2 ">
+                {/* Main nav */}
+                <div className="flex flex-1 items-center gap-6 max-md:justify-between">
+                  <button className="flex items-center">
+                    <img
+                      src={LogoImg}
+                      style={{ height: "150px", weight: "300px" }}
+                      alt="Logo"
+                    />
+                  </button>
+                </div>
+              </div>
+              {/* CENTER: Navigation + Search */}
+              <div className="flex flex-1 items-center  gap-6">
+                {!isMobile && (
+                  <NavigationMenu className="flex">
+                    <NavigationMenuList className="gap-1">
+                      {navigationLinks.map((link, index) => (
+                        <NavigationMenuItem key={index}>
+                          <NavigationMenuLink className="text-muted-foreground hover:text-primary py-1.5 font-medium transition-colors cursor-pointer group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50">
+                            <Link to={link.path}>{link.label}</Link>
+                          </NavigationMenuLink>
+                        </NavigationMenuItem>
+                      ))}
+                    </NavigationMenuList>
+                  </NavigationMenu>
+                )}
+
+                <form
+                  onSubmit={handleSearchSubmit}
+                  className="relative md:hidden"
                 >
-                  <div className="relative inline-block">
-                    <ShoppingCart />
-                    {itemCount > 0 && (
-                      <div
-                        className="
+                  <Input
+                    id={searchId}
+                    name="search"
+                    className="peer h-8 ps-8 pe-2"
+                    placeholder={searchPlaceholder}
+                    type="search"
+                  />
+                  <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-2 peer-disabled:opacity-50">
+                    <SearchIcon size={16} />
+                  </div>
+                </form>
+              </div>
+              {/* Right side */}
+              {!isMobile && (
+                <div className="flex items-center gap-3">
+                  <Button
+                    size="sm"
+                    className="text-sm font-medium px-4 h-9 rounded-md shadow-sm cursor-pointer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (onCartClick) onCartClick();
+                      {
+                        navigate("/cart");
+                      }
+                    }}
+                  >
+                    <div className="relative inline-block">
+                      <ShoppingCart />
+                      {itemCount > 0 && (
+                        <div
+                          className="
                 absolute  
                 bg-red-500 text-white 
                 rounded-full 
@@ -192,26 +233,28 @@ export const Navbar04 = React.forwardRef(
                 text-xs font-bold 
                 shadow-md
             "
-                        style={{ top: "-18px", right: "-21px" }}
-                      >
-                        {itemCount}
-                      </div>
-                    )}
-                  </div>
+                          style={{ top: "-18px", right: "-21px" }}
+                        >
+                          {itemCount}
+                        </div>
+                      )}
+                    </div>
 
-                  {/* <span>Cart ({cart?.items?.length || 0})</span> */}
-                </Button>
-                <Button
-                  size="sm"
-                  asChild
-                  className="text-sm font-medium px-4 h-9 rounded-md shadow-sm "
-                >
-                  <DropdownMenuDialog />
-                </Button>
-              </div>
-            )}
-          </div>
-        </header>
+                    {/* <span>Cart ({cart?.items?.length || 0})</span> */}
+                  </Button>
+                  <Button
+                    size="sm"
+                    asChild
+                    className="text-sm font-medium px-4 h-9 rounded-md shadow-sm "
+                  >
+                    <DropdownMenuDialog />
+                  </Button>
+                </div>
+              )}
+            </div>
+          </header>
+        )}
+
         {/* bottom navbar mobile */}
         {isMobile && (
           <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-md md:hidden">

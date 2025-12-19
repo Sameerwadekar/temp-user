@@ -24,6 +24,7 @@ export function LoginForm({ className, ...props }) {
 
   const { user, token, logOutUser, loginUser } = useLogin();
   const navigate = useNavigate();
+  
 
   // 👇 show/hide password state
   const [showPassword, setShowPassword] = useState(false);
@@ -43,7 +44,6 @@ export function LoginForm({ className, ...props }) {
         }
 
         loginUser(result.token, result.userDto);
-        navigate("/menu");
       })
       .catch((err) => console.log(err));
   };

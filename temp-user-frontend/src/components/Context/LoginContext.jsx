@@ -19,8 +19,14 @@ export function LoginProvider({ children }) {
   const loginUser = (token, user) => {
     settoken(token);
     setuser(user);
+    console.log(user);
     localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user)); // ✔ correct
+    localStorage.setItem("user", JSON.stringify(user)); 
+    if(user.roleName === "ROLE_ADMIN"){
+      navigate("/admin");
+    }  else {
+      navigate("/menu");
+    }
     toast.success("Login Successful");
   };
 

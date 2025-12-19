@@ -16,8 +16,12 @@ import {
   SelectValue,
   SelectContent,
 } from "@/components/ui/select";
-import { CartContext } from "./Context/CartContext";
+import {
+  RadioGroup,
+  RadioGroupItem
+} from "@/components/ui/radio-group";
 
+import { CartContext } from "./Context/CartContext";
 
 export default function CheckOutPage() {
   const { cart, getCart } = useContext(CartContext);
@@ -49,7 +53,9 @@ export default function CheckOutPage() {
         {/* Shopping Cart */}
         <Card className="p-4">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold">Order Summary</CardTitle>
+            <CardTitle className="text-lg font-semibold">
+              Order Summary
+            </CardTitle>
             <p className="text-sm text-gray-500">
               You have {cart?.items?.length || 0} items in your cart
             </p>
@@ -57,7 +63,10 @@ export default function CheckOutPage() {
 
           <CardContent className="flex flex-col gap-4">
             {cart?.items?.map((item) => (
-              <div key={item.cartItemId} className="flex items-center justify-between">
+              <div
+                key={item.cartItemId}
+                className="flex items-center justify-between"
+              >
                 <div className="flex items-center gap-3">
                   <img
                     src={`http://localhost:8080/products/${item.productId}/image`}
@@ -65,7 +74,9 @@ export default function CheckOutPage() {
                   />
                   <div>
                     <p className="font-medium">{item.productName}</p>
-                    <p className="text-sm text-gray-500">{item.quantity} × ₹{item.price}</p>
+                    <p className="text-sm text-gray-500">
+                      {item.quantity} × ₹{item.price}
+                    </p>
                   </div>
                 </div>
                 <p className="font-semibold">₹{item.totalPrice}</p>
@@ -108,7 +119,10 @@ export default function CheckOutPage() {
       <div className="w-full lg:w-2/3">
         <Accordion type="single" collapsible defaultValue="personal">
           {/* PERSONAL DETAILS */}
-          <AccordionItem className="bg-white rounded-xl border" value="personal">
+          <AccordionItem
+            className="bg-white rounded-xl border"
+            value="personal"
+          >
             <AccordionTrigger className="px-4">
               Your Personal Details
             </AccordionTrigger>
@@ -141,13 +155,15 @@ export default function CheckOutPage() {
             className="bg-white rounded-xl border mt-4"
             value="shipping"
           >
-            <AccordionTrigger className="px-4">Shipping Address</AccordionTrigger>
+            <AccordionTrigger className="px-4">
+              Shipping Address
+            </AccordionTrigger>
             <AccordionContent className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input placeholder="First Name" />
-              <Input placeholder="Last Name" />
-              <Input placeholder="Email Address" />
-              <Input placeholder="Phone" />
-              <Input placeholder="Mailing Address" className="md:col-span-2" />
+              <Input placeholder="Label (Home/Work)" />
+              <Input placeholder="Recipient Name*" />
+              <Input placeholder="Phone*" />
+              <Input placeholder="Address Line 1*" />
+              <Input placeholder="Address Line 2" className="md:col-span-2" />
               <Input placeholder="City" />
               <Input placeholder="Post Code" />
               <Input placeholder="Country" />
@@ -172,27 +188,69 @@ export default function CheckOutPage() {
             value="payment"
           >
             <AccordionTrigger className="px-4">Payment Info</AccordionTrigger>
-            <AccordionContent className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input placeholder="First Name" />
-              <Input placeholder="Last Name" />
-              <Input placeholder="Email Address" />
-              <Input placeholder="Phone" />
-              <Input placeholder="Mailing Address" className="md:col-span-2" />
-              <Input placeholder="City" />
-              <Input placeholder="Post Code" />
-              <Input placeholder="Country" />
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a state" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="mh">Maharashtra</SelectItem>
-                  <SelectItem value="gj">Gujarat</SelectItem>
-                  <SelectItem value="dl">Delhi</SelectItem>
-                </SelectContent>
-              </Select>
 
-              <Button className="md:col-span-2 w-fit">Make Payment</Button>
+            <AccordionContent className="p-6 space-y-6">
+              {/* Payment Methods */}
+              <div className="space-y-3">
+                <p className="font-medium text-lg">Select Payment Method</p>
+
+                <RadioGroup defaultValue="credit">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="credit" id="credit" />
+                    <label htmlFor="credit" className="cursor-pointer">
+                      Credit card
+                    </label>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="paypal" id="paypal" />
+                    <label htmlFor="paypal" className="cursor-pointer">
+                      Paypal
+                    </label>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="cod" id="cod" />
+                    <label htmlFor="cod" className="cursor-pointer">
+                      Cash on delivery
+                    </label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              <div className="border-t pt-4 space-y-4">
+                {/* CARD NAME */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium">Name on Card:</label>
+                  <Input placeholder="John Joe" />
+                </div>
+
+                {/* CARD NUMBER */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium">Card Number:</label>
+                  <Input placeholder="0000 0000 0000 1235" />
+                </div>
+
+                {/* EXP + CVV */}
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium">MM</label>
+                    <Input placeholder="25" />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium">YYYY</label>
+                    <Input placeholder="2027" />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium">CVV</label>
+                    <Input placeholder="248" />
+                  </div>
+                </div>
+
+                <Button className="w-full md:w-fit mt-4">Place Order</Button>
+              </div>
             </AccordionContent>
           </AccordionItem>
         </Accordion>

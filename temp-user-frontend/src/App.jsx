@@ -67,6 +67,10 @@ function App() {
         {
           path:"/checkout",
           element:<CheckOutPage/>
+        },
+        {
+          path:"/admin",
+          element:<CheckOutPage/>
         }
       ],
     },
