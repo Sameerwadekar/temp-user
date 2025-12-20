@@ -6,14 +6,17 @@ import Footer from "./components/Footer";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import Menu from "./components/Menu";
 import { ToastContainer } from "react-toastify";
-import { LoginProvider } from "./components/Context/LoginContext";
+import { LoginProvider, useLogin } from "./components/Context/LoginContext";
 import CartPage from "./components/CartPage";
 import OrderSummary from "./components/OrderSummary";
 import { CartContext } from "./components/Context/CartContext";
 import { useContext, useEffect } from "react";
 import CheckOutPage from "./components/CheckOutPage";
+import { MenuProvider } from "./components/Context/AdminMenuContext";
+import Product from "./components/Product";
 
 function Layout() {
+  const { token, user } = useLogin();
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar stays on top */}
@@ -23,24 +26,29 @@ function Layout() {
       <main className="grow">
         <Outlet />
       </main>
-
-      {/* Footer always touches bottom */}
-      <Footer />
+      {token && user.roleName == "ROLE_ADMIN" ? (
+        <div className="d-hidden"></div>
+      ) : (
+        <>
+          <Footer />
+        </>
+      )}
     </div>
   );
 }
 
 function App() {
-  const {  getCart } =
-        useContext(CartContext);
-      useEffect(() => {
-        getCart();
-      }, []);
+  const { getCart } = useContext(CartContext);
+  useEffect(() => {
+    getCart();
+  }, []);
   const router = createBrowserRouter([
     {
       element: (
         <LoginProvider>
-          <Layout />
+          <MenuProvider>
+            <Layout />
+          </MenuProvider>
         </LoginProvider>
       ),
       children: [
@@ -61,17 +69,17 @@ function App() {
           element: <Menu />,
         },
         {
-          path:"/cart",
-          element:<CartPage/>
+          path: "/cart",
+          element: <CartPage />,
         },
         {
-          path:"/checkout",
-          element:<CheckOutPage/>
+          path: "/checkout",
+          element: <CheckOutPage />,
         },
         {
-          path:"/admin",
-          element:<CheckOutPage/>
-        }
+          path: "/admin/products",
+          element: <Product/>,
+        },
       ],
     },
     {

@@ -23,7 +23,7 @@ export function LoginProvider({ children }) {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user)); 
     if(user.roleName === "ROLE_ADMIN"){
-      navigate("/admin");
+      navigate("/admin/products");
     }  else {
       navigate("/menu");
     }
@@ -36,7 +36,7 @@ export function LoginProvider({ children }) {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     toast.success("LogOut Successfully");
-    setTimeout(() => navigate("/"), 1000);
+    setTimeout(() => navigate("/login"), 1000);
   };
 
   return (
