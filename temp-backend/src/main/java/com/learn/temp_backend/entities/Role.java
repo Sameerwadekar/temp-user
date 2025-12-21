@@ -2,6 +2,8 @@ package com.learn.temp_backend.entities;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -24,5 +26,6 @@ public class Role {
 	@Enumerated(EnumType.STRING)
 	private AppRole roleName;
 	@OneToMany(mappedBy = "role")
+	@JsonManagedReference
 	private List<User> users;
 }

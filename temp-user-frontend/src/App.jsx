@@ -14,6 +14,8 @@ import { useContext, useEffect } from "react";
 import CheckOutPage from "./components/CheckOutPage";
 import { MenuProvider } from "./components/Context/AdminMenuContext";
 import Product from "./components/Product";
+import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 
 function Layout() {
   const { token, user } = useLogin();
@@ -65,21 +67,19 @@ function App() {
           element: <SignupForm />,
         },
         {
-          path: "/menu",
-          element: <Menu />,
+          element:<ProtectedRoute/>,
+          children:[
+          { path: "/menu", element: <Menu /> },
+          { path: "/cart", element: <CartPage /> },
+          { path: "/checkout", element: <CheckOutPage /> },
+          ]
         },
         {
-          path: "/cart",
-          element: <CartPage />,
-        },
-        {
-          path: "/checkout",
-          element: <CheckOutPage />,
-        },
-        {
-          path: "/admin/products",
-          element: <Product/>,
-        },
+          element:<AdminRoute/>,
+          children:[
+            { path: "/admin/products", element: <Product /> },
+          ]
+        }
       ],
     },
     {

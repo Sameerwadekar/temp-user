@@ -1,7 +1,13 @@
 package com.learn.temp_backend.entities;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,10 +31,13 @@ public class Orders {
 	private String status="PENDING";
 	private String paymentId;
 	private String razorPayOrderId;
-	private int amount;
+	private BigDecimal amount;
 	@ManyToOne
+	@JsonManagedReference
 	private User user;
-	@OneToMany
-	private List<OrderItem> orderItems; 
+	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+	@JsonBackReference
+	private List<OrderItem> orderItems = new ArrayList<>();
+
 	
 }

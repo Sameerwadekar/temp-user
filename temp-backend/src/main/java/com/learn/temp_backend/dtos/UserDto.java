@@ -1,5 +1,5 @@
 package com.learn.temp_backend.dtos;
-import com.learn.foodapp.entities.Role;
+//import com.learn.foodapp.entities.Role;
 import com.learn.temp_backend.validators.PasswordMatch;
 
 import jakarta.validation.constraints.NotBlank;
