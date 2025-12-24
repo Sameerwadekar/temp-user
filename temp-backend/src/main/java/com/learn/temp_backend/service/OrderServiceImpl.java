@@ -84,4 +84,9 @@ public class OrderServiceImpl implements OrderService {
 
 	    return savedOrder;
 	}
+	@Override
+	public List<Orders> getAllOrders() {
+		List<Orders> allOrders = orderRepositary.findAll();
+		return allOrders;
+	}
 }

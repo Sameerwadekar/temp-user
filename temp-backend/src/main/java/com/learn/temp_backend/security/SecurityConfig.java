@@ -34,6 +34,7 @@ public class SecurityConfig {
 		.requestMatchers(HttpMethod.GET, "/product/**", "/products/**", "/categories/**","/cart/**").permitAll()
 		.requestMatchers(HttpMethod.DELETE,"/cart/**").permitAll()
 		.requestMatchers(HttpMethod.PUT,"/cart/**").permitAll()
+		.requestMatchers(HttpMethod.GET,"/orders/new-order").hasRole("ADMIN")
 		.anyRequest().authenticated());
 		httpSecurity.exceptionHandling(authentication -> authentication.authenticationEntryPoint(authEntryPointJwt));
 		httpSecurity.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);

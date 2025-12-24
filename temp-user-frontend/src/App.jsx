@@ -8,7 +8,6 @@ import Menu from "./components/Menu";
 import { ToastContainer } from "react-toastify";
 import { LoginProvider, useLogin } from "./components/Context/LoginContext";
 import CartPage from "./components/CartPage";
-import OrderSummary from "./components/OrderSummary";
 import { CartContext } from "./components/Context/CartContext";
 import { useContext, useEffect } from "react";
 import CheckOutPage from "./components/CheckOutPage";
@@ -16,6 +15,7 @@ import { MenuProvider } from "./components/Context/AdminMenuContext";
 import Product from "./components/Product";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
+import OrderProvider from "./components/Context/OrderContext";
 
 function Layout() {
   const { token, user } = useLogin();
@@ -67,19 +67,21 @@ function App() {
           element: <SignupForm />,
         },
         {
-          element:<ProtectedRoute/>,
-          children:[
-          { path: "/menu", element: <Menu /> },
-          { path: "/cart", element: <CartPage /> },
-          { path: "/checkout", element: <CheckOutPage /> },
-          ]
+          element: <ProtectedRoute />,
+          children: [
+            { path: "/menu", element: <Menu /> },
+            { path: "/cart", element: <CartPage /> },
+            { path: "/checkout", element: <CheckOutPage /> },
+          ],
         },
         {
-          element:<AdminRoute/>,
-          children:[
-            { path: "/admin/products", element: <Product /> },
-          ]
-        }
+          element: (
+            <OrderProvider>
+              <AdminRoute />
+            </OrderProvider>
+          ),
+          children: [{ path: "/admin/products", element: <Product /> }],
+        },
       ],
     },
     {
