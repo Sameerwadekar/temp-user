@@ -21,8 +21,6 @@ public class UserDto {
 	@Size(min = 3)
     @Pattern(regexp = "^[A-Za-z ]+$", message = "Name must contain only letters and spaces, no numbers allowed")
 	private String name;
-	@NotNull(message = "password should not be null")
-	@NotBlank(message = "password should not be blank")
 	private String password;
 	private String confirmPassword;	
 	@NotNull(message = "email should not be null")

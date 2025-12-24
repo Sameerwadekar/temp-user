@@ -1,0 +1,147 @@
+Google OAuth2 Login with Spring Boot (Step-by-Step)
+Phase 1 – Google OAuth Configuration
+1️⃣ Create Google Cloud Project
+
+Go to Google Cloud Console
+
+Click Select Project → New Project
+
+Enter a project name
+Example: spring-oauth-demo
+
+Click Create
+
+2️⃣ Configure OAuth Consent Screen
+
+Go to APIs & Services → OAuth consent screen
+
+User Type → External
+
+Click Create20:02 24-12-2025
+
+App Information
+
+App name → Spring OAuth App (or any name)
+
+User support email → your email
+
+Developer contact email → your email
+
+Scopes
+
+Add:
+
+✅ email
+
+✅ profile
+
+Click Save & Continue → Save
+
+⚠️ App can remain in Testing mode for localhost usage
+
+3️⃣ Create OAuth Client ID
+
+Go to APIs & Services → Credentials
+
+Click Create Credentials → OAuth Client ID
+
+Application type → Web application
+
+Name → Spring Boot Client
+
+Authorized Redirect URI (IMPORTANT)
+http://localhost:8080/login/oauth2/code/google
+
+
+Click Create
+
+4️⃣ Copy Credentials
+
+After creation, copy:
+
+✅ Client ID
+
+✅ Client Secret
+
+⚠️ Keep these credentials private
+
+Phase 2 – Spring Boot Configuration
+5️⃣ Configure Client ID & Secret
+application.yml
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: YOUR_CLIENT_ID
+            client-secret: YOUR_CLIENT_SECRET
+            scope:
+              - email
+              - profile
+
+OR application.properties
+spring.security.oauth2.client.registration.google.client-id=YOUR_CLIENT_ID
+spring.security.oauth2.client.registration.google.client-secret=YOUR_CLIENT_SECRET
+spring.security.oauth2.client.registration.google.scope=email,profile
+
+6️⃣ Add Spring Security Dependency
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-oauth2-client</artifactId>
+</dependency>
+
+7️⃣ Update AuthTokenFilter
+@Override
+protected void doFilterInternal(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        FilterChain filterChain
+) throws ServletException, IOException {
+
+    String path = request.getServletPath();
+
+    // ✅ Allow OAuth2 endpoints without JWT
+    if (path.startsWith("/oauth2/")
+        || path.startsWith("/login/oauth2/")
+        || path.equals("/auth/login")
+        || path.equals("/error")) {
+
+        filterChain.doFilter(request, response);
+        return;
+    }
+
+    // existing JWT logic below
+}
+
+8️⃣ Update SecurityConfig
+.requestMatchers(HttpMethod.POST, "/oauth2/**").permitAll()
+.requestMatchers(HttpMethod.GET, "/oauth2/**").permitAll()
+.anyRequest().authenticated())
+.oauth2Login(oauth -> oauth
+        .defaultSuccessUrl("/", true)
+);
+
+9️⃣ Login URL (Frontend / Browser)
+http://localhost:8080/oauth2/authorization/google
+
+
+
+How to Test Phase-1
+
+Start Spring Boot app
+
+Open browser (incognito recommended)
+
+Visit:
+
+http://localhost:8080/oauth2/authorization/google
+
+
+Google Consent Screen appears
+
+Click Continue
+
+Redirect happens back to backend
+
+✅ If consent screen appears → Phase-1 SUCCESS

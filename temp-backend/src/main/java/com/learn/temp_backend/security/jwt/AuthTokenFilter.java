@@ -33,6 +33,17 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         logger.debug("AuthTokenFilter called for URI: {}", request.getRequestURI());
+        String path = request.getServletPath();
+
+      
+        if (path.startsWith("/oauth2/")
+            || path.startsWith("/login/oauth2/")
+            || path.equals("/auth/login")
+            || path.equals("/error")) {
+
+            filterChain.doFilter(request, response);
+            return;
+        }
         try {
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {

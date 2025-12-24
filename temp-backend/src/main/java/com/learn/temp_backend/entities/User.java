@@ -15,6 +15,8 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -47,6 +49,9 @@ public class User implements UserDetails{
 	@OneToMany(mappedBy = "user")
 	@JsonBackReference
 	private List<Orders> orders;
+	@Enumerated(EnumType.STRING)
+	private AuthProvider provider;
+	private String providerId;
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		// TODO Auto-generated method stub

@@ -1,0 +1,216 @@
+Google OAuth2 Login with Spring Boot (Step-by-Step)
+Phase 2 – Backend OAuth2 + JWT Integration (No Frontend)
+
+This phase integrates Google OAuth2 login with JWT authentication in a stateless Spring Boot backend, allowing OAuth login without a frontend and returning a JWT token.
+
+10️⃣ User Entity Setup
+
+Add AuthProvider enum to track login type.
+
+public enum AuthProvider {
+    LOCAL,
+    GOOGLE
+}
+
+
+Update User entity:
+
+@Enumerated(EnumType.STRING)
+private AuthProvider provider;
+
+
+Purpose:
+
+Prevent Google users from logging in using email/password
+
+Distinguish OAuth users from normal users
+
+1️⃣1️⃣ UserDetailsService Provider Check
+
+Prevent Google users from using normal login.
+
+@Override
+public UserDetails loadUserByUsername(String username) {
+    User user = userRepository.findByEmail(username)
+            .orElseThrow(() -> new RuntimeException("Email not found"));
+
+    if (user.getProvider() == AuthProvider.GOOGLE) {
+        throw new BadCredentialsException("Use Google Login");
+    }
+
+    return user;
+}
+
+
+✅ Ensures correct login flow
+✅ Prevents password misuse
+
+1️⃣2️⃣ CustomOAuth2UserService
+
+Handles:
+
+Reading Google user info
+
+Creating user if not exists
+
+Assigning provider = GOOGLE
+
+@Service
+public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Override
+    public OAuth2User loadUser(OAuth2UserRequest userRequest)
+            throws OAuth2AuthenticationException {
+
+        OAuth2User oAuth2User = super.loadUser(userRequest);
+        String email = oAuth2User.getAttribute("email");
+
+        userRepository.findByEmail(email).orElseGet(() -> {
+            User user = new User();
+            user.setEmail(email);
+            user.setProvider(AuthProvider.GOOGLE);
+            user.setRole(AppRole.ROLE_USER);
+            return userRepository.save(user);
+        });
+
+        return oAuth2User;
+    }
+}
+
+
+✅ User auto-creation
+✅ No password required
+✅ Google becomes trusted identity provider
+
+1️⃣3️⃣ OAuth2AuthenticationSuccessHandler (JWT Generation)
+
+Generates JWT token after Google login.
+
+@Component
+public class OAuth2AuthenticationSuccessHandler
+        extends SimpleUrlAuthenticationSuccessHandler {
+
+    @Autowired
+    private JwtUtils jwtUtils;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Override
+    public void onAuthenticationSuccess(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Authentication authentication
+    ) throws IOException {
+
+        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+        String email = oAuth2User.getAttribute("email");
+
+        UserDetails userDetails =
+                userDetailsService.loadUserByUsername(email);
+
+        String jwt = jwtUtils.generateTokenFromUsername(userDetails);
+
+        // Return token directly (no frontend)
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+        response.getWriter().write("{\"token\":\"" + jwt + "\"}");
+        response.getWriter().flush();
+
+        clearAuthenticationAttributes(request);
+    }
+}
+
+
+✅ Converts OAuth login → JWT
+✅ No redirect
+✅ Perfect for API-only backend
+
+1️⃣4️⃣ SecurityConfig Configuration
+
+Enable OAuth2 login and JWT filter.
+
+.oauth2Login(oauth -> oauth
+        .userInfoEndpoint(userInfo ->
+                userInfo.userService(customOAuth2UserService)
+        )
+        .successHandler(oAuth2AuthenticationSuccessHandler)
+);
+
+
+Also ensure:
+
+.sessionManagement(session ->
+        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+)
+.formLogin(form -> form.disable())
+.httpBasic(basic -> basic.disable());
+
+
+✅ Stateless API
+✅ No session storage
+✅ OAuth + JWT combined
+
+1️⃣5️⃣ add this in AuthTokenFilter
+
+Allow OAuth endpoints without JWT.
+
+if (path.startsWith("/oauth2/")
+    || path.startsWith("/login/oauth2/")
+    || path.equals("/auth/login")
+    || path.equals("/error")) {
+
+    filterChain.doFilter(request, response);
+    return;
+}
+
+
+✅ Prevents JWT filter from blocking OAuth flow
+
+1️⃣6️⃣ OAuth Login URL
+
+Use browser (not Postman):
+
+http://localhost:8080/oauth2/authorization/google
+
+How to Test Phase-2 (No Frontend)
+
+1️⃣ Start Spring Boot app
+2️⃣ Open browser (Incognito recommended)
+3️⃣ Visit:
+
+http://localhost:8080/oauth2/authorization/google
+
+
+4️⃣ Login using Google
+5️⃣ After redirect → backend returns:
+
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9..."
+}
+
+
+✅ JWT token successfully generated
+✅ User created automatically
+✅ OAuth2 + JWT integration complete
+
+Phase-2 Success Criteria
+
+✔ Google login works
+✔ User saved in database
+✔ JWT returned
+✔ Stateless authentication
+✔ No frontend required
+
+🧠 Notes
+
+OAuth users cannot login using password
+
+JWT is required for protected APIs
+
+Token must be sent as:
+
+Authorization: Bearer <JWT>
