@@ -10,4 +10,6 @@ import com.learn.temp_backend.entities.Orders;
 public interface OrderService {
 	Orders placeOrder(String userId,@AuthenticationPrincipal UserDetails userDetails);
 	List<Orders> getAllOrders();
+	Orders createPayment(int orderId);
+	void confirmPayment(String orderId,String paymentId);
 }

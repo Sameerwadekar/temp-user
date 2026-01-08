@@ -109,13 +109,11 @@
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-oauth2-client</artifactId>
 </dependency>
-
-
-		<!-- <dependency>
-			<groupId>com.learn</groupId>
-			<artifactId>foodapp</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency> -->
+<dependency>
+    <groupId>com.razorpay</groupId>
+    <artifactId>razorpay-java</artifactId>
+    <version>1.4.8</version>
+    </dependency>
 	</dependencies>
 
 	<build>

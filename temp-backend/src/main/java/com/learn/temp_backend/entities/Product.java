@@ -3,6 +3,8 @@ package com.learn.temp_backend.entities;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,6 +32,7 @@ public class Product {
 	private String description;
 	private boolean available;
 	@ManyToOne
+	@JsonManagedReference
 	private Category category;
 	private String productImage;
 }

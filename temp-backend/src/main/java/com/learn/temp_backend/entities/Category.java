@@ -2,6 +2,8 @@ package com.learn.temp_backend.entities;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,5 +25,6 @@ public class Category {
 	@Column(nullable = false,length = 150)
 	private String name;
 	@OneToMany(mappedBy = "category")
+	@JsonBackReference
 	private List<Product> products;
 }

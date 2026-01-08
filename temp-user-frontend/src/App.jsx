@@ -16,6 +16,7 @@ import Product from "./components/Product";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import OrderProvider from "./components/Context/OrderContext";
+import OrderPayment from "./components/OrderPayment";
 
 function Layout() {
   const { token, user } = useLogin();
@@ -65,6 +66,18 @@ function App() {
         {
           path: "/signin",
           element: <SignupForm />,
+        },
+        {
+          path: "/done",
+          element: (
+            <OrderPayment
+              userId={"6b0ad1c6-9523-4996-8d51-242c2ecb69b4"}
+              workshopId={2}
+              jwtToken={
+                "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJzYW1lZXJAZ21haWwuY29tIiwicm9sZXMiOiJST0xFX1VTRVIiLCJpYXQiOjE3Njc3NzEzMzIsImV4cCI6MTc3MDM2MzMzMn0.YzQF2GDqM_KmqDeOukB2FMmhfzHEafYj5A_U-UFIXniv90ZDXlG6Nizp0zhO4IKMn"
+              }
+            /> 
+          ),
         },
         {
           element: <ProtectedRoute />,
