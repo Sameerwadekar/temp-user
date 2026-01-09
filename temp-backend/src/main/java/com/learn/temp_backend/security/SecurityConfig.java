@@ -49,7 +49,7 @@ public class SecurityConfig {
         .httpBasic(basic -> basic.disable())
         .requestCache(cache -> cache.disable())
 		.authorizeHttpRequests(req -> req.requestMatchers(HttpMethod.POST,"/users/**","/auth/login","/cart/**","/cart-item/**","/products/**").permitAll()
-		.requestMatchers(HttpMethod.GET, "/product/**", "/products/**", "/categories/**","/cart/**").permitAll()
+		.requestMatchers(HttpMethod.GET, "/product/**", "/products/**", "/categories/**","/cart/**","/","/health").permitAll()
 		.requestMatchers(HttpMethod.DELETE,"/cart/**").permitAll()
 		.requestMatchers(HttpMethod.PUT,"/cart/**").permitAll()
 		.requestMatchers(HttpMethod.GET,"/orders/new-order").hasRole("ADMIN")
