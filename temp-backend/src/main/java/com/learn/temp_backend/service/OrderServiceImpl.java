@@ -4,17 +4,21 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.learn.temp_backend.dtos.AddressDto;
+import com.learn.temp_backend.entities.Address;
 import com.learn.temp_backend.entities.Cart;
 import com.learn.temp_backend.entities.CartItem;
 import com.learn.temp_backend.entities.OrderItem;
 import com.learn.temp_backend.entities.Orders;
 import com.learn.temp_backend.entities.PaymentStatus;
 import com.learn.temp_backend.entities.User;
+import com.learn.temp_backend.repositary.AddressRepositary;
 import com.learn.temp_backend.repositary.CartRepositary;
 import com.learn.temp_backend.repositary.OrderItemRepositary;
 import com.learn.temp_backend.repositary.OrderRepositary;
@@ -32,9 +36,11 @@ public class OrderServiceImpl implements OrderService {
 	
 	@Autowired CartRepositary cartRepositary;
 	@Autowired private RazorPayService razorPayService;
+	@Autowired private ModelMapper modelMapper;
+	@Autowired private AddressRepositary addressRepositary;
 	@Transactional
 	@Override
-	public Orders placeOrder(String userId, UserDetails userDetails) {
+	public Orders placeOrder(String userId, UserDetails userDetails,AddressDto addressDto) {
 
 	    User user = userRepositary.findByEmail(userDetails.getUsername())
 	            .orElseThrow(() -> new RuntimeException("User not found"));
@@ -49,12 +55,19 @@ public class OrderServiceImpl implements OrderService {
 	    if (cartItems.isEmpty()) {
 	        throw new RuntimeException("Cart is empty");
 	    }
+	    
+//	    set Address
+	    Address address = new Address();
+	    Address orderAddress = modelMapper.map(addressDto, Address.class);
+	    Address savedAddress = addressRepositary.save(orderAddress);
+	    
 
 	    // 1️⃣ Create & save ORDER first
 	    Orders order = new Orders();
 	    order.setUser(user);
 	    order.setStatus("PAYMENT_PENDING");
 	    order.setPaymentStatus(PaymentStatus.CREATED);
+	    order.setAddress(savedAddress);
 
 	    Orders savedOrder = orderRepositary.save(order); // ✅ ID GENERATED HERE
 
@@ -123,6 +136,8 @@ public class OrderServiceImpl implements OrderService {
 		List<Orders> allOrders = orderRepositary.findAll();
 		return allOrders;
 	}
+	
+
 
 	@Override
 	public void confirmPayment(String orderId, String paymentId) {
@@ -132,4 +147,16 @@ public class OrderServiceImpl implements OrderService {
 		order.setStatus("PAID");
 		orderRepositary.save(order);
 	}
+
+
+	@Override
+	public List<Orders> getUserOrderById(String userid, UserDetails userDetails) {
+		User user = userRepositary.findByEmail(userDetails.getUsername()).orElseThrow(()->new RuntimeException("User not found"));
+		if(!user.getId().equals(userid)) {
+			throw new RuntimeException("unAuthorized");
+		}
+		return orderRepositary.findByUserId(userid);
+	}
+
+
 }

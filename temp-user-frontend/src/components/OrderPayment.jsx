@@ -1,18 +1,23 @@
 import React from "react";
+import { useLogin } from "./Context/LoginContext";
 
-const OrderPayment = ({ userId, jwtToken }) => {
-
+const OrderPayment = ({  address }) => {
+  const { token, user } = useLogin();
   const startPayment = async () => {
     try {
+       if (!token || !user) {
+        throw new Error("User not logged in");
+      }
       // 1️⃣ Place Order
       const orderRes = await fetch(
-        `http://localhost:8080/orders/place/${userId}`,
+        `http://localhost:8080/orders/place/${user.id}`,
         {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${jwtToken}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
+          body: JSON.stringify(address), // ✅ SEND ADDRESS
         }
       );
 
@@ -28,7 +33,7 @@ const OrderPayment = ({ userId, jwtToken }) => {
         {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${jwtToken}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -56,7 +61,7 @@ const OrderPayment = ({ userId, jwtToken }) => {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${jwtToken}`,
+                Authorization: `Bearer ${token}`,
               },
               body: JSON.stringify({
                 razorpayOrderId: response.razorpay_order_id,
@@ -85,18 +90,13 @@ const OrderPayment = ({ userId, jwtToken }) => {
 
       const razorpay = new window.Razorpay(options);
       razorpay.open();
-
     } catch (error) {
       console.error(error);
       alert("❌ Something went wrong");
     }
   };
 
-  return (
-    <button onClick={startPayment}>
-      Pay Now
-    </button>
-  );
+  return <button onClick={startPayment}>Pay Now</button>;
 };
 
 export default OrderPayment;

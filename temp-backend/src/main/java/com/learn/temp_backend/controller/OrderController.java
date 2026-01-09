@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.learn.temp_backend.dtos.AddressDto;
 import com.learn.temp_backend.entities.Orders;
 import com.learn.temp_backend.repositary.OrderRepositary;
 import com.learn.temp_backend.service.OrderService;
@@ -35,8 +36,8 @@ public class OrderController {
 	
 	
 	@PostMapping("/place/{userId}")
-	public ResponseEntity<Orders> placeOrder(@PathVariable String userId,@AuthenticationPrincipal UserDetails userDetails){
-		Orders placedOrder = orderService.placeOrder(userId, userDetails);
+	public ResponseEntity<Orders> placeOrder(@PathVariable String userId,@AuthenticationPrincipal UserDetails userDetails, @RequestBody AddressDto addressDto){
+		Orders placedOrder = orderService.placeOrder(userId, userDetails,addressDto);
 		return new ResponseEntity<Orders>(placedOrder,HttpStatus.OK);
 	}
 	
@@ -65,5 +66,10 @@ public class OrderController {
 	@GetMapping("/new-orders")
 	public ResponseEntity<List<Orders>> allOrders(){
 		return ResponseEntity.ok(orderService.getAllOrders());
+	}
+	
+	@GetMapping("/{userId}")
+	public ResponseEntity<List<Orders>> Orders(@PathVariable String userId,@AuthenticationPrincipal UserDetails userDetails){
+		return ResponseEntity.ok(orderService.getUserOrderById(userId, userDetails));
 	}
 }

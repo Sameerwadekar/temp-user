@@ -35,7 +35,7 @@ export function DropdownMenuDialog() {
             <>
               {/* <p>{user?.name}</p> */}
               <DropdownMenuGroup>
-                <DropdownMenuItem className="cursor-pointer">My profile</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer"onClick={() => {navigate("/profile")}} >My profile</DropdownMenuItem>
                 <DropdownMenuItem className="cursor-pointer">My Orders</DropdownMenuItem>
                 <DropdownMenuItem onClick={()=>{logOutUser()}} className="cursor-pointer">Log Out</DropdownMenuItem>
               </DropdownMenuGroup>

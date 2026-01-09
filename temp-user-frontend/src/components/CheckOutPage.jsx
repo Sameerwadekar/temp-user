@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,19 +16,31 @@ import {
   SelectValue,
   SelectContent,
 } from "@/components/ui/select";
-import {
-  RadioGroup,
-  RadioGroupItem
-} from "@/components/ui/radio-group";
+import { useForm } from "react-hook-form";
 
 import { CartContext } from "./Context/CartContext";
+import OrderPayment from "./OrderPayment";
 
-export default function CheckOutPage() {
+export default function CheckOutPage({ userId, jwtToken }) {
   const { cart, getCart } = useContext(CartContext);
+  const [shippingAddress, setShippingAddress] = useState(null);
 
   useEffect(() => {
     getCart();
   }, []);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = (data) => {
+    console.log("Shipping Address:", data);
+    setShippingAddress(data);
+    // onSubmitAddress(data); // send to backend
+  };
 
   return (
     <div className="w-full flex flex-col lg:flex-row gap-6 p-6 bg-gray-50 min-h-screen">
@@ -158,99 +170,78 @@ export default function CheckOutPage() {
             <AccordionTrigger className="px-4">
               Shipping Address
             </AccordionTrigger>
-            <AccordionContent className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input placeholder="Label (Home/Work)" />
-              <Input placeholder="Recipient Name*" />
-              <Input placeholder="Phone*" />
-              <Input placeholder="Address Line 1*" />
-              <Input placeholder="Address Line 2" className="md:col-span-2" />
-              <Input placeholder="City" />
-              <Input placeholder="Post Code" />
-              <Input placeholder="Country" />
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a state" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="mh">Maharashtra</SelectItem>
-                  <SelectItem value="gj">Gujarat</SelectItem>
-                  <SelectItem value="dl">Delhi</SelectItem>
-                </SelectContent>
-              </Select>
 
-              <Button className="md:col-span-2 w-fit">Next Step</Button>
-            </AccordionContent>
-          </AccordionItem>
+            <AccordionContent className="p-4">
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className="grid grid-cols-1 md:grid-cols-2 gap-4"
+              >
+                <Input
+                  placeholder="Full Name*"
+                  {...register("fullName", { required: true })}
+                />
 
-          {/* PAYMENT */}
-          <AccordionItem
-            className="bg-white rounded-xl border mt-4"
-            value="payment"
-          >
-            <AccordionTrigger className="px-4">Payment Info</AccordionTrigger>
+                <Input
+                  placeholder="Phone*"
+                  {...register("phone", {
+                    required: true,
+                    pattern: /^[0-9]{10}$/,
+                  })}
+                />
 
-            <AccordionContent className="p-6 space-y-6">
-              {/* Payment Methods */}
-              <div className="space-y-3">
-                <p className="font-medium text-lg">Select Payment Method</p>
+                <Input
+                  placeholder="House / Flat*"
+                  {...register("house", { required: true })}
+                />
 
-                <RadioGroup defaultValue="credit">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="credit" id="credit" />
-                    <label htmlFor="credit" className="cursor-pointer">
-                      Credit card
-                    </label>
-                  </div>
+                <Input
+                  placeholder="Street / Road*"
+                  {...register("street", { required: true })}
+                />
 
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="paypal" id="paypal" />
-                    <label htmlFor="paypal" className="cursor-pointer">
-                      Paypal
-                    </label>
-                  </div>
+                <Input placeholder="Area" {...register("area")} />
 
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="cod" id="cod" />
-                    <label htmlFor="cod" className="cursor-pointer">
-                      Cash on delivery
-                    </label>
-                  </div>
-                </RadioGroup>
-              </div>
+                <Input
+                  placeholder="City*"
+                  {...register("city", { required: true })}
+                />
 
-              <div className="border-t pt-4 space-y-4">
-                {/* CARD NAME */}
-                <div className="space-y-1">
-                  <label className="text-sm font-medium">Name on Card:</label>
-                  <Input placeholder="John Joe" />
-                </div>
+                <Input
+                  placeholder="Pincode*"
+                  {...register("pincode", {
+                    required: true,
+                    pattern: /^[0-9]{6}$/,
+                  })}
+                />
 
-                {/* CARD NUMBER */}
-                <div className="space-y-1">
-                  <label className="text-sm font-medium">Card Number:</label>
-                  <Input placeholder="0000 0000 0000 1235" />
-                </div>
+                <Input
+                  placeholder="Country*"
+                  defaultValue="India"
+                  {...register("country", { required: true })}
+                />
 
-                {/* EXP + CVV */}
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">MM</label>
-                    <Input placeholder="25" />
-                  </div>
+                {/* STATE SELECT */}
+                <Select onValueChange={(value) => setValue("state", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select State" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Maharashtra">Maharashtra</SelectItem>
+                    <SelectItem value="Gujarat">Gujarat</SelectItem>
+                    <SelectItem value="Delhi">Delhi</SelectItem>
+                  </SelectContent>
+                </Select>
 
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">YYYY</label>
-                    <Input placeholder="2027" />
-                  </div>
+                <Button type="submit" className="md:col-span-2 w-fit">
+                  Save Address
+                </Button>
 
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">CVV</label>
-                    <Input placeholder="248" />
-                  </div>
-                </div>
-
-                <Button className="w-full md:w-fit mt-4">Place Order</Button>
-              </div>
+                {shippingAddress && (
+                  <OrderPayment
+                    address={shippingAddress}
+                  />
+                )}
+              </form>
             </AccordionContent>
           </AccordionItem>
         </Accordion>
