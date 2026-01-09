@@ -21,7 +21,6 @@ import com.learn.temp_backend.repositary.UserRepositary;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.var;
 
 @Service
 @RequiredArgsConstructor
