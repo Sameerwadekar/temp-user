@@ -18,6 +18,7 @@ import AdminRoute from "./components/AdminRoute";
 import OrderProvider from "./components/Context/OrderContext";
 import OrderPayment from "./components/OrderPayment";
 import Profile from "./components/Profile";
+import OAuth2Success from "./components/OAuthSuccess";
 
 function Layout() {
   const { token, user } = useLogin();
@@ -82,6 +83,10 @@ function App() {
         {
           path: "/profile",
           element: <Profile />,
+        },
+        {
+          path:"/oauth2/success",
+           element:<OAuth2Success/>
         },
         {
           element: <ProtectedRoute />,

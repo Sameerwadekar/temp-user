@@ -24,7 +24,6 @@ export function LoginForm({ className, ...props }) {
 
   const { user, token, logOutUser, loginUser } = useLogin();
   const navigate = useNavigate();
-  
 
   // 👇 show/hide password state
   const [showPassword, setShowPassword] = useState(false);
@@ -58,7 +57,6 @@ export function LoginForm({ className, ...props }) {
         <CardContent className="w-full md:w-full lg:w-1/3">
           <form className="p-6 md:p-8 mt-5" onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup className="space-y-6">
-
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
@@ -105,11 +103,7 @@ export function LoginForm({ className, ...props }) {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black"
                   >
-                    {showPassword ? (
-                      <EyeOff size={20} />
-                    ) : (
-                      <Eye size={20} />
-                    )}
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
 
@@ -132,9 +126,18 @@ export function LoginForm({ className, ...props }) {
       </div>
 
       <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our{" "}
-        <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
+        and <a href="#">Privacy Policy</a>.
       </FieldDescription>
+      <Button
+        type="button"
+        onClick={() => {
+          window.location.href =
+            "http://localhost:8080/oauth2/authorization/google";
+        }}
+      >
+        Login with Google
+      </Button>
     </div>
   );
 }

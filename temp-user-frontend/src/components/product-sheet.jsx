@@ -190,7 +190,10 @@ const DataTableDemo = () => {
 
     fetch(url, {
       method: data.id ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
       body: JSON.stringify(data),
     })
       .then((res) => res.json())

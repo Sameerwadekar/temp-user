@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,6 +59,19 @@ public class AuthController {
 		UserDto userDto = modelMapper.map(user, UserDto.class);
 		loginResponse.setUserDto(userDto);
 		return new ResponseEntity<LoginResponse>(loginResponse,HttpStatus.OK);
+	}
+	
+	@GetMapping("/me")
+	public ResponseEntity<UserDto> getCurrentUser(Authentication authentication) {
+
+	    String email = authentication.getName(); // comes from JWT subject
+
+	    User user = userRepositary.findByEmail(email)
+	            .orElseThrow(() -> new RuntimeException("User not found"));
+
+	    UserDto userDto = modelMapper.map(user, UserDto.class);
+
+	    return ResponseEntity.ok(userDto);
 	}
 
 }

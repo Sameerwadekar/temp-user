@@ -1,0 +1,129 @@
+STEP 3️⃣ Create CustomOAuth2UserService
+
+Purpose:
+✔ Read Google user info
+✔ Create user if not exists
+✔ Return OAuth2User
+
+Checklist:
+
+Extract email
+
+Save user if new
+
+Assign ROLE_USER
+
+(You already implemented this ✔)
+
+STEP 4️⃣ Create OAuth2AuthenticationSuccessHandler
+
+Purpose:
+✔ Generate JWT
+✔ Redirect to frontend
+
+Rule: NEVER return JSON here
+
+String redirectUrl =
+    "http://localhost:5173/oauth2/success?token=" + jwt;
+
+getRedirectStrategy().sendRedirect(request, response, redirectUrl);
+
+
+📌 This is the handoff point between backend & frontend.
+
+STEP 5️⃣ Keep your normal login controller
+POST /auth/login
+
+
+✔ This stays
+✔ OAuth2 does not replace it
+
+STEP 6️⃣ Add /auth/me endpoint
+
+Purpose:
+✔ Common endpoint for BOTH login types
+
+@GetMapping("/auth/me")
+public UserDto getCurrentUser(Authentication authentication) {
+    String email = authentication.getName();
+    User user = userRepository.findByEmail(email).orElseThrow();
+    return modelMapper.map(user, UserDto.class);
+}
+
+STEP 7️⃣ Security configuration checklist
+.requestMatchers("/oauth2/**").permitAll()
+.requestMatchers("/auth/login").permitAll()
+.requestMatchers("/auth/me").authenticated()
+
+
+JWT filter must run for /auth/me.
+
+✅ PART B — FRONTEND (React)
+STEP 8️⃣ Add “Login with Google” button
+
+Rule: NO fetch()
+
+<Button
+  onClick={() =>
+    window.location.href =
+      "http://localhost:8080/oauth2/authorization/google"
+  }
+>
+  Login with Google
+</Button>
+
+
+📌 OAuth2 = navigation, not API.
+
+STEP 9️⃣ Create OAuth success page
+
+Create file:
+
+OAuth2Success.jsx
+
+
+Purpose:
+✔ Read token from URL
+✔ Fetch user
+✔ Store login state
+
+// OAuth2Success.jsx
+import { useEffect } from "react";
+import { useLogin } from "./Context/LoginContext";
+import { useNavigate } from "react-router-dom";
+
+export default function OAuth2Success() {
+  const { loginUser } = useLogin();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    // fetch user details using token
+    fetch("http://localhost:8080/auth/me", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(res => res.json())
+      .then(user => {
+        loginUser(token, user);
+      });
+  }, []);
+
+  return <p>Logging you in...</p>;
+}
+
+
+STEP 🔟 Register route (MOST COMMON MISTAKE)
+<Route path="/oauth2/success" element={<OAuth2Success />} />
+
+
+❌ Without this → 404
+✔ With this → login works
